@@ -1,0 +1,8 @@
+language: java
+jdk:
+  - oraclejdk8
+script: mvn clean verify test -Dgpg.skip=true
+install: mvn install -DskipTests=true -Dgpg.skip=true
+cache: 
+  - apt
+  - $HOME/.m2
