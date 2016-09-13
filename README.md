@@ -33,29 +33,17 @@ public class Test {
 
     public static void main(String[] args) throws MqttException {
         new Client(Region.STAGING, "MyAppEUI", "MyAppSecret")
-                .registerHandler(new MessageHandler() {
-                    @Override
-                    public void accept(Mesage t) {
-                        System.out.println("new message: " + t.payload);
-                    }
+                .registerMessageHandler((Mesage t) -> {
+                    System.out.println("new message: " + t.payload);
                 })
-                .registerHandler(new ActivationHandler() {
-                    @Override
-                    public void accept(Mesage t) {
-                        System.out.println("new activation: " + t.payload);
-                    }
+                .registerActivationHandler((Mesage t) -> {
+                    System.out.println("new activation: " + t.payload);
                 })
-                .registerHandler(new ErrorHandler() {
-                    @Override
-                    public void accept(Throwable t) {
-                        System.out.println("error: " + t);
-                    }
+                .registerErrorHandler((Throwable t) -> {
+                    System.out.println("error: " + t);
                 })
-                .registerHandler(new ConnectHandler() {
-                    @Override
-                    public void accept(MqttClient t) {
-                        System.out.println("connected !");
-                    }
+                .registerConnectHandler((MqttClient t) -> {
+                    System.out.println("connected !");
                 })
                 .start();
     }
