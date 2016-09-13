@@ -26,7 +26,7 @@ package org.thethingsnetwork.java.app.lib;
 import java.io.IOException;
 import java.util.Base64;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -199,7 +199,7 @@ public class Client {
         }
         mqttClient = new MqttClient(broker, MqttClient.generateClientId(), persistence);
         mqttClient.connect(connOpts);
-        mqttClient.setCallback(new MqttCallbackExtended() {
+        mqttClient.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
                 mqttClient = null;
@@ -241,14 +241,10 @@ public class Client {
                  * Not supported for now
                  */
             }
-
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                if (connectHandler != null) {
-                    connectHandler.accept(mqttClient);
-                }
-            }
         });
+        if (connectHandler != null) {
+            connectHandler.accept(mqttClient);
+        }
         mqttClient.subscribe(_topics);
         return this;
     }
@@ -296,6 +292,7 @@ public class Client {
 
     /**
      * Force destroy the client in case stop() does not work.
+     *
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
@@ -310,6 +307,7 @@ public class Client {
 
     /**
      * Send a downlink message
+     *
      * @param _devId The devId (devEUI for staging) to send the message to
      * @param _payload The payload to be sent
      * @param _port The port to use for the message
