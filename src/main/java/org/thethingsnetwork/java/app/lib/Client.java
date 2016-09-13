@@ -110,7 +110,7 @@ public class Client {
      * @param _handler The connection event handler
      * @return the Client instance
      */
-    public Client registerHandler(ConnectHandler _handler) {
+    public Client registerConnectHandler(ConnectHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -124,7 +124,7 @@ public class Client {
      * @param _handler The error event handler
      * @return the Client instance
      */
-    public Client registerHandler(ErrorHandler _handler) {
+    public Client registerErrorHandler(ErrorHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -138,7 +138,7 @@ public class Client {
      * @param _handler The activation event handler
      * @return the Client instance
      */
-    public Client registerHandler(ActivationHandler _handler) {
+    public Client registerActivationHandler(ActivationHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -152,7 +152,7 @@ public class Client {
      * @param _handler The message event handler
      * @return the Client instance
      */
-    public Client registerHandler(MessageHandler _handler) {
+    public Client registerMessageHandler(MessageHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -265,11 +265,11 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client stop() throws MqttException {
+    public Client end() throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
         }
-        return stop(5000);
+        return end(5000);
     }
 
     /**
@@ -279,7 +279,7 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client stop(long _timeout) throws MqttException {
+    public Client end(long _timeout) throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
         }
@@ -296,7 +296,7 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client stopNow() throws MqttException {
+    public Client endNow() throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
         }
