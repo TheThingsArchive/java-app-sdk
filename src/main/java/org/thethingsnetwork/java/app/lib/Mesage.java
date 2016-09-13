@@ -26,6 +26,7 @@ package org.thethingsnetwork.java.app.lib;
 import org.json.JSONObject;
 
 /**
+ * A Message wrapper
  *
  * @author Romain Cambier <me@romaincambier.be>
  */

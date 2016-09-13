@@ -40,6 +40,7 @@ import org.thethingsnetwork.java.app.lib.handlers.ErrorHandler;
 import org.thethingsnetwork.java.app.lib.handlers.MessageHandler;
 
 /**
+ * This is the base class to be used to interact with The Things Network Handler
  *
  * @author Romain Cambier <me@romaincambier.be>
  */
@@ -66,14 +67,36 @@ public class Client {
      */
     private MqttClient mqttClient;
 
+    /**
+     * Create a new Client from an official TTN broker
+     *
+     * @param _region The broker region to be used
+     * @param _appId Your appId (or appEUI for staging)
+     * @param _appAccessKey Your appAccessKey
+     */
     public Client(Region _region, String _appId, String _appAccessKey) {
         this(_region, _appId, _appAccessKey, false);
     }
 
+    /**
+     * Create a new Client from an official TTN broker
+     *
+     * @param _region The broker region to be used
+     * @param _appId Your appId (or appEUI for staging)
+     * @param _appAccessKey Your appAccessKey
+     * @param _ssl whether to use ssl for the connection
+     */
     public Client(Region _region, String _appId, String _appAccessKey, boolean _ssl) {
         this((_ssl ? "ssl://" : "tcp://") + _region.toUrl() + (_ssl ? ":8883" : ":1883"), _appId, _appAccessKey);
     }
 
+    /**
+     * Create a new Client from a custom broker
+     *
+     * @param _broker The broker address, including protocol and port
+     * @param _appId Your appId (or appEUI for staging)
+     * @param _appAccessKey Your appAccessKey
+     */
     public Client(String _broker, String _appId, String _appAccessKey) {
         broker = _broker;
         appId = _appId;
@@ -81,6 +104,12 @@ public class Client {
         connOpts.setPassword(_appAccessKey.toCharArray());
     }
 
+    /**
+     * Register a connection event handler
+     *
+     * @param _handler The connection event handler
+     * @return the Client instance
+     */
     public Client registerHandler(ConnectHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -89,6 +118,12 @@ public class Client {
         return this;
     }
 
+    /**
+     * Register an error event handler
+     *
+     * @param _handler The error event handler
+     * @return the Client instance
+     */
     public Client registerHandler(ErrorHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -97,6 +132,12 @@ public class Client {
         return this;
     }
 
+    /**
+     * Register an activation event handler
+     *
+     * @param _handler The activation event handler
+     * @return the Client instance
+     */
     public Client registerHandler(ActivationHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -105,6 +146,12 @@ public class Client {
         return this;
     }
 
+    /**
+     * Register a message event handler
+     *
+     * @param _handler The message event handler
+     * @return the Client instance
+     */
     public Client registerHandler(MessageHandler _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -113,6 +160,12 @@ public class Client {
         return this;
     }
 
+    /**
+     * Change the default Mqtt persistence settings
+     *
+     * @param _persistence A custom persistence setting
+     * @return the Client instance
+     */
     public Client setMqttPersistence(MqttClientPersistence _persistence) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -121,6 +174,11 @@ public class Client {
         return this;
     }
 
+    /**
+     * Access to the connection options used for mqtt
+     *
+     * @return the connection options
+     */
     public MqttConnectOptions getMqttConnectOptions() {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
@@ -128,6 +186,13 @@ public class Client {
         return connOpts;
     }
 
+    /**
+     * Start the client and subscribe to provided topics
+     *
+     * @param _topics The topics to subscribe to
+     * @return the Client instance
+     * @throws MqttException in case something goes wrong
+     */
     public Client start(String... _topics) throws MqttException {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -188,10 +253,22 @@ public class Client {
         return this;
     }
 
+    /**
+     * Start the client and subscribe to activations and uplink
+     *
+     * @return the Client instance
+     * @throws MqttException in case something goes wrong
+     */
     public Client start() throws MqttException {
         return start("+/devices/+/activations", "+/devices/+/up");
     }
 
+    /**
+     * Stop the client after max. 5000 ms
+     *
+     * @return the Client instance
+     * @throws MqttException in case something goes wrong
+     */
     public Client stop() throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -199,6 +276,13 @@ public class Client {
         return stop(5000);
     }
 
+    /**
+     * Stop the client after max. the provided timeout
+     *
+     * @param _timeout The disconnect timeout
+     * @return the Client instance
+     * @throws MqttException in case something goes wrong
+     */
     public Client stop(long _timeout) throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -210,6 +294,11 @@ public class Client {
         return this;
     }
 
+    /**
+     * Force destroy the client in case stop() does not work.
+     * @return the Client instance
+     * @throws MqttException in case something goes wrong
+     */
     public Client stopNow() throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -219,6 +308,13 @@ public class Client {
         return this;
     }
 
+    /**
+     * Send a downlink message
+     * @param _devId The devId (devEUI for staging) to send the message to
+     * @param _payload The payload to be sent
+     * @param _port The port to use for the message
+     * @throws MqttException in case something goes wrong
+     */
     public void send(String _devId, byte[] _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
