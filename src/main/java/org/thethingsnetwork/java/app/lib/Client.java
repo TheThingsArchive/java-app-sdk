@@ -25,6 +25,7 @@ package org.thethingsnetwork.java.app.lib;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -34,15 +35,11 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
-import org.thethingsnetwork.java.app.lib.handlers.ActivationHandler;
-import org.thethingsnetwork.java.app.lib.handlers.ConnectHandler;
-import org.thethingsnetwork.java.app.lib.handlers.ErrorHandler;
-import org.thethingsnetwork.java.app.lib.handlers.MessageHandler;
 
 /**
  * This is the base class to be used to interact with The Things Network Handler
  *
- * @author Romain Cambier <me@romaincambier.be>
+ * @author Romain Cambier
  */
 public class Client {
 
@@ -57,38 +54,15 @@ public class Client {
     /**
      * Event handlers
      */
-    private ConnectHandler connectHandler;
-    private ErrorHandler errorHandler;
-    private ActivationHandler activationHandler;
-    private MessageHandler messageHandler;
+    private Consumer<MqttClient> connectHandler;
+    private Consumer<Throwable> errorHandler;
+    private Consumer<JSONObject> activationHandler;
+    private Consumer<JSONObject> messageHandler;
 
     /**
      * Runtime vars
      */
     private MqttClient mqttClient;
-
-    /**
-     * Create a new Client from an official TTN broker
-     *
-     * @param _region The broker region to be used
-     * @param _appId Your appId (or appEUI for staging)
-     * @param _appAccessKey Your appAccessKey
-     */
-    public Client(Region _region, String _appId, String _appAccessKey) {
-        this(_region, _appId, _appAccessKey, false);
-    }
-
-    /**
-     * Create a new Client from an official TTN broker
-     *
-     * @param _region The broker region to be used
-     * @param _appId Your appId (or appEUI for staging)
-     * @param _appAccessKey Your appAccessKey
-     * @param _ssl whether to use ssl for the connection
-     */
-    public Client(Region _region, String _appId, String _appAccessKey, boolean _ssl) {
-        this((_ssl ? "ssl://" : "tcp://") + _region.toUrl() + (_ssl ? ":8883" : ":1883"), _appId, _appAccessKey);
-    }
 
     /**
      * Create a new Client from a custom broker
@@ -98,7 +72,7 @@ public class Client {
      * @param _appAccessKey Your appAccessKey
      */
     public Client(String _broker, String _appId, String _appAccessKey) {
-        broker = _broker;
+        broker = _broker.contains(".") ? _broker : _broker + ".thethings.network";
         appId = _appId;
         connOpts.setUserName(_appId);
         connOpts.setPassword(_appAccessKey.toCharArray());
@@ -110,7 +84,7 @@ public class Client {
      * @param _handler The connection event handler
      * @return the Client instance
      */
-    public Client registerConnectHandler(ConnectHandler _handler) {
+    public Client registerConnectHandler(Consumer<MqttClient> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -124,7 +98,7 @@ public class Client {
      * @param _handler The error event handler
      * @return the Client instance
      */
-    public Client registerErrorHandler(ErrorHandler _handler) {
+    public Client registerErrorHandler(Consumer<Throwable> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -138,7 +112,7 @@ public class Client {
      * @param _handler The activation event handler
      * @return the Client instance
      */
-    public Client registerActivationHandler(ActivationHandler _handler) {
+    public Client registerActivationHandler(Consumer<JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -152,7 +126,7 @@ public class Client {
      * @param _handler The message event handler
      * @return the Client instance
      */
-    public Client registerMessageHandler(MessageHandler _handler) {
+    public Client registerMessageHandler(Consumer<JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -220,12 +194,20 @@ public class Client {
                 switch (tokens[3]) {
                     case "up":
                         if (messageHandler != null) {
-                            messageHandler.accept(new Mesage(tokens[0], tokens[2], new JSONObject(new String(message.getPayload()))));
+                            messageHandler.accept(
+                                    new JSONObject(new String(message.getPayload()))
+                                    .put("dev_id", tokens[2])
+                                    .put("app_id", tokens[0])
+                            );
                         }
                         break;
                     case "activations":
                         if (activationHandler != null) {
-                            activationHandler.accept(new Mesage(tokens[0], tokens[2], new JSONObject(new String(message.getPayload()))));
+                            activationHandler.accept(
+                                    new JSONObject(new String(message.getPayload()))
+                                    .put("dev_id", tokens[2])
+                                    .put("app_id", tokens[0])
+                            );
                         }
                         break;
                     default:

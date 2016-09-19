@@ -32,19 +32,11 @@ import org.thethingsnetwork.java.app.lib.handlers.MessageHandler;
 public class Test {
 
     public static void main(String[] args) throws MqttException {
-        new Client(Region.STAGING, "MyAppEUI", "MyAppSecret")
-                .registerMessageHandler((Mesage t) -> {
-                    System.out.println("new message: " + t.payload);
-                })
-                .registerActivationHandler((Mesage t) -> {
-                    System.out.println("new activation: " + t.payload);
-                })
-                .registerErrorHandler((Throwable t) -> {
-                    System.out.println("error: " + t);
-                })
-                .registerConnectHandler((MqttClient t) -> {
-                    System.out.println("connected !");
-                })
+        new Client("eu, "MyAppEUI", "MyAppSecret")
+                .registerMessageHandler((JSONObject t) -> System.out.println("new message: " + t))
+                .registerActivationHandler((JSONObject t) -> System.out.println("new activation: " + t))
+                .registerErrorHandler((Throwable t) -> System.out.println("error: " + t))
+                .registerConnectHandler((MqttClient t) -> System.out.println("connected !"))
                 .start();
     }
 
