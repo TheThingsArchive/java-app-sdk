@@ -56,8 +56,8 @@ public class Client {
      */
     private Consumer<MqttClient> connectHandler;
     private Consumer<Throwable> errorHandler;
-    private Consumer<JSONObject> activationHandler;
-    private Consumer<JSONObject> messageHandler;
+    private Consumer<Message> activationHandler;
+    private Consumer<Message> messageHandler;
 
     /**
      * Runtime vars
@@ -112,7 +112,7 @@ public class Client {
      * @param _handler The activation event handler
      * @return the Client instance
      */
-    public Client registerActivationHandler(Consumer<JSONObject> _handler) {
+    public Client registerActivationHandler(Consumer<Message> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -126,7 +126,7 @@ public class Client {
      * @param _handler The message event handler
      * @return the Client instance
      */
-    public Client registerMessageHandler(Consumer<JSONObject> _handler) {
+    public Client registerMessageHandler(Consumer<Message> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -194,20 +194,18 @@ public class Client {
                 switch (tokens[3]) {
                     case "up":
                         if (messageHandler != null) {
-                            messageHandler.accept(
-                                    new JSONObject(new String(message.getPayload()))
-                                    .put("dev_id", tokens[2])
-                                    .put("app_id", tokens[0])
-                            );
+                            Message msg = new Message(new String(message.getPayload()));
+                            msg.put("dev_id", tokens[2]);
+                            msg.put("app_id", tokens[0]);
+                            messageHandler.accept(msg);
                         }
                         break;
                     case "activations":
                         if (activationHandler != null) {
-                            activationHandler.accept(
-                                    new JSONObject(new String(message.getPayload()))
-                                    .put("dev_id", tokens[2])
-                                    .put("app_id", tokens[0])
-                            );
+                            Message msg = new Message(new String(message.getPayload()));
+                            msg.put("dev_id", tokens[2]);
+                            msg.put("app_id", tokens[0]);
+                            activationHandler.accept(msg);
                         }
                         break;
                     default:
