@@ -32,7 +32,7 @@ import org.thethingsnetwork.java.app.lib.handlers.MessageHandler;
 public class Test {
 
     public static void main(String[] args) throws MqttException {
-        new Client("eu, "MyAppEUI", "MyAppSecret")
+        new Client("eu", "MyAppEUI", "MyAppSecret")
                 .registerMessageHandler((JSONObject t) -> System.out.println("new message: " + t))
                 .registerActivationHandler((JSONObject t) -> System.out.println("new activation: " + t))
                 .registerErrorHandler((Throwable t) -> System.out.println("error: " + t))
