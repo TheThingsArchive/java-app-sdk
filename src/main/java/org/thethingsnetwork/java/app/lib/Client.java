@@ -24,6 +24,8 @@
 package org.thethingsnetwork.java.app.lib;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -70,12 +72,32 @@ public class Client {
      * @param _broker The broker address, including protocol and port
      * @param _appId Your appId (or appEUI for staging)
      * @param _appAccessKey Your appAccessKey
+     * @throws java.net.URISyntaxException if the provided broker address is malformed
      */
-    public Client(String _broker, String _appId, String _appAccessKey) {
-        broker = _broker.contains(".") ? _broker : _broker + ".thethings.network";
+    public Client(String _broker, String _appId, String _appAccessKey) throws URISyntaxException {
+        broker = validateBroker(_broker);
         appId = _appId;
         connOpts.setUserName(_appId);
         connOpts.setPassword(_appAccessKey.toCharArray());
+    }
+
+    private String validateBroker(String _source) throws URISyntaxException {
+
+        URI tempBroker = new URI(_source.contains(".") ? _source : (_source + ".thethings.network"));
+
+        switch (tempBroker.getScheme()) {
+            case "tcp":
+                if (tempBroker.getPort() == -1) {
+                    return tempBroker.toString() + ":1883";
+                }
+                break;
+            case "ssl":
+                if (tempBroker.getPort() == -1) {
+                    return tempBroker.toString() + ":8883";
+                }
+                break;
+        }
+        return "tcp://" + tempBroker.getHost() + ":1883";
     }
 
     /**
