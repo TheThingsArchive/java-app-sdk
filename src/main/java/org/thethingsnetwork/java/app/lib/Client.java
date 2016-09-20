@@ -308,7 +308,7 @@ public class Client {
     }
 
     /**
-     * Send a downlink message
+     * Send a downlink message using raw data
      *
      * @param _devId The devId (devEUI for staging) to send the message to
      * @param _payload The payload to be sent
@@ -318,6 +318,21 @@ public class Client {
     public void send(String _devId, byte[] _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
+        data.put("port", _port != 0 ? _port : 1);
+        mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
+    }
+    
+    /**
+     * Send a downlink message using pre-registered encoder
+     *
+     * @param _devId The devId (devEUI for staging) to send the message to
+     * @param _payload The payload to be sent
+     * @param _port The port to use for the message
+     * @throws MqttException in case something goes wrong
+     */
+    public void send(String _devId, JSONObject _payload, int _port) throws MqttException {
+        JSONObject data = new JSONObject();
+        data.put("payload_fields", _payload);
         data.put("port", _port != 0 ? _port : 1);
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
