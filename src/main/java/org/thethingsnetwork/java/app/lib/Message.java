@@ -34,12 +34,12 @@ import org.json.JSONObject;
  */
 public class Message extends JSONObject {
 
-    public byte[] getRawPayload() {
-        Object object = get("payload_raw");
+    public byte[] getBinary(String _key) {
+        Object object = get(_key);
         if (object instanceof String) {
             return Base64.getDecoder().decode((String) object);
         }
-        throw new JSONException("JSONObject[\"payload_raw\"] is not a base64 decodable string.");
+        throw new JSONException("JSONObject[" + quote(_key) + "] is not a base64 decodable string.");
     }
 
     public Message(String _source) {

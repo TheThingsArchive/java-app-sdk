@@ -1,4 +1,5 @@
 /target/
+/sample/target/
 /.classpath
 /.project
 /.settings

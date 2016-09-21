@@ -85,19 +85,19 @@ public class Client {
 
         URI tempBroker = new URI(_source.contains(".") ? _source : (_source + ".thethings.network"));
 
-        switch (tempBroker.getScheme()) {
-            case "tcp":
-                if (tempBroker.getPort() == -1) {
-                    return tempBroker.toString() + ":1883";
-                }
-                break;
-            case "ssl":
-                if (tempBroker.getPort() == -1) {
-                    return tempBroker.toString() + ":8883";
-                }
-                break;
+        if ("tcp".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":1883";
+            }
+        } else if ("ssl".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":8883";
+            }
+        } else {
+            return "tcp://" + tempBroker.getPath() + ":1883";
         }
-        return "tcp://" + tempBroker.getHost() + ":1883";
+        
+        return tempBroker.toString();
     }
 
     /**
@@ -321,7 +321,7 @@ public class Client {
         data.put("port", _port != 0 ? _port : 1);
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
-    
+
     /**
      * Send a downlink message using pre-registered encoder
      *

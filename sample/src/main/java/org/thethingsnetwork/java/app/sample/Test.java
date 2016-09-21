@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package org.thethingsnetwork.java.app.sample;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -30,18 +31,13 @@ import org.json.JSONObject;
 import org.thethingsnetwork.java.app.lib.Client;
 import org.thethingsnetwork.java.app.lib.Message;
 
-/**
- * This is the base class to be used to interact with The Things Network Handler
- *
- * @author Romain Cambier
- */
 public class Test {
 
     public static void main(String[] args) throws MqttException, MalformedURLException, URISyntaxException {
 
         String region = "eu";
-        String appId = "";
-        String accessKey = "";
+        String appId = "azerty";
+        String accessKey = "azerty";
 
         Client client = new Client(region, appId, accessKey);
 

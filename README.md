@@ -42,3 +42,18 @@ public class Test {
 }
 
 ```
+
+To test this sample code, clone this repo (you can also download the zip):
+```bash
+git clone https://github.com/TheThingsNetwork/java-app-lib.git && cd java-app-lib/sample
+```
+Set your credentials in the java file:
+```java
+  String region = "eu";
+  String appId = "";
+  String accessKey = "";
+```
+Finally, run the Test class:
+```bash
+mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.java.app.sample.Test"
+```
