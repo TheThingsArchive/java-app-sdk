@@ -51,7 +51,7 @@ public class Client {
     private final String broker;
     private final String appId;
     private MqttClientPersistence persistence = new MemoryPersistence();
-    private final MqttConnectOptions connOpts = new MqttConnectOptions();
+    private final MqttConnectOptions connOpts;
 
     /**
      * Event handlers
@@ -75,8 +75,26 @@ public class Client {
      * @throws java.net.URISyntaxException if the provided broker address is malformed
      */
     public Client(String _broker, String _appId, String _appAccessKey) throws URISyntaxException {
+        this(_broker, _appId, _appAccessKey, null);
+    }
+
+    /**
+     * Create a new Client from a custom broker
+     *
+     * @param _broker The broker address, including protocol and port
+     * @param _appId Your appId (or appEUI for staging)
+     * @param _appAccessKey Your appAccessKey
+     * @param _connOpts Connection options to be used
+     * @throws java.net.URISyntaxException if the provided broker address is malformed
+     */
+    public Client(String _broker, String _appId, String _appAccessKey, MqttConnectOptions _connOpts) throws URISyntaxException {
         broker = validateBroker(_broker);
         appId = _appId;
+        if (_connOpts != null) {
+            connOpts = _connOpts;
+        } else {
+            connOpts = new MqttConnectOptions();
+        }
         connOpts.setUserName(_appId);
         connOpts.setPassword(_appAccessKey.toCharArray());
     }
@@ -96,7 +114,7 @@ public class Client {
         } else {
             return "tcp://" + tempBroker.getPath() + ":1883";
         }
-        
+
         return tempBroker.toString();
     }
 
@@ -168,18 +186,6 @@ public class Client {
         }
         persistence = _persistence;
         return this;
-    }
-
-    /**
-     * Access to the connection options used for mqtt
-     *
-     * @return the connection options
-     */
-    public MqttConnectOptions getMqttConnectOptions() {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        return connOpts;
     }
 
     /**
