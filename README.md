@@ -18,23 +18,21 @@ A Quick Start and full API Reference can be found in [The Things Network Documen
 
 ## Example
 
-```java
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.thethingsnetwork.java.app.lib.Client;
-import org.thethingsnetwork.java.app.lib.Message;
+A [sample app](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.java) is included. To run:
 
-public class Test {
+1.  Install [OpenJDK](http://openjdk.java.net/install/) or [Java](https://www.java.com/en/download/).
+2.  [Download](http://maven.apache.org/download.cgi) and [Instal](http://maven.apache.org/install.html) Maven.
+3.  [Download](https://github.com/TheThingsNetwork/java-app-lib/archive/master.zip) or [clone](https://help.github.com/articles/which-remote-url-should-i-use/) the repository.
+4.  Build and cache the artifact:
 
-    public static void main(String[] args) throws MqttException {
-        new Client("eu", "MyAppEUI", "MyAppSecret")
-                .registerMessageHandler((Message t) -> System.out.println("new message: " + t))
-                .registerActivationHandler((Message t) -> System.out.println("new activation: " + t))
-                .registerErrorHandler((Throwable t) -> System.out.println("error: " + t))
-                .registerConnectHandler((MqttClient t) -> System.out.println("connected !"))
-                .start();
-    }
+    ```bash
+    mvn clean package install
+    ```
 
-}
+5.  Set your region, Application ID and Access Key in [Test.java](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.java).
+6.  Build and run the Test class:
 
-```
+    ```bash
+    cd sample
+    mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.java.app.sample.Test"
+    ```

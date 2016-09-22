@@ -24,6 +24,8 @@
 package org.thethingsnetwork.java.app.lib;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -49,7 +51,7 @@ public class Client {
     private final String broker;
     private final String appId;
     private MqttClientPersistence persistence = new MemoryPersistence();
-    private final MqttConnectOptions connOpts = new MqttConnectOptions();
+    private final MqttConnectOptions connOpts;
 
     /**
      * Event handlers
@@ -70,12 +72,50 @@ public class Client {
      * @param _broker The broker address, including protocol and port
      * @param _appId Your appId (or appEUI for staging)
      * @param _appAccessKey Your appAccessKey
+     * @throws java.net.URISyntaxException if the provided broker address is malformed
      */
-    public Client(String _broker, String _appId, String _appAccessKey) {
-        broker = _broker.contains(".") ? _broker : _broker + ".thethings.network";
+    public Client(String _broker, String _appId, String _appAccessKey) throws URISyntaxException {
+        this(_broker, _appId, _appAccessKey, null);
+    }
+
+    /**
+     * Create a new Client from a custom broker
+     *
+     * @param _broker The broker address, including protocol and port
+     * @param _appId Your appId (or appEUI for staging)
+     * @param _appAccessKey Your appAccessKey
+     * @param _connOpts Connection options to be used
+     * @throws java.net.URISyntaxException if the provided broker address is malformed
+     */
+    public Client(String _broker, String _appId, String _appAccessKey, MqttConnectOptions _connOpts) throws URISyntaxException {
+        broker = validateBroker(_broker);
         appId = _appId;
+        if (_connOpts != null) {
+            connOpts = _connOpts;
+        } else {
+            connOpts = new MqttConnectOptions();
+        }
         connOpts.setUserName(_appId);
         connOpts.setPassword(_appAccessKey.toCharArray());
+    }
+
+    private String validateBroker(String _source) throws URISyntaxException {
+
+        URI tempBroker = new URI(_source.contains(".") ? _source : (_source + ".thethings.network"));
+
+        if ("tcp".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":1883";
+            }
+        } else if ("ssl".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":8883";
+            }
+        } else {
+            return "tcp://" + tempBroker.getPath() + ":1883";
+        }
+
+        return tempBroker.toString();
     }
 
     /**
@@ -146,18 +186,6 @@ public class Client {
         }
         persistence = _persistence;
         return this;
-    }
-
-    /**
-     * Access to the connection options used for mqtt
-     *
-     * @return the connection options
-     */
-    public MqttConnectOptions getMqttConnectOptions() {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        return connOpts;
     }
 
     /**
@@ -286,7 +314,7 @@ public class Client {
     }
 
     /**
-     * Send a downlink message
+     * Send a downlink message using raw data
      *
      * @param _devId The devId (devEUI for staging) to send the message to
      * @param _payload The payload to be sent
@@ -296,6 +324,21 @@ public class Client {
     public void send(String _devId, byte[] _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
+        data.put("port", _port != 0 ? _port : 1);
+        mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
+    }
+
+    /**
+     * Send a downlink message using pre-registered encoder
+     *
+     * @param _devId The devId (devEUI for staging) to send the message to
+     * @param _payload The payload to be sent
+     * @param _port The port to use for the message
+     * @throws MqttException in case something goes wrong
+     */
+    public void send(String _devId, JSONObject _payload, int _port) throws MqttException {
+        JSONObject data = new JSONObject();
+        data.put("payload_fields", _payload);
         data.put("port", _port != 0 ? _port : 1);
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
