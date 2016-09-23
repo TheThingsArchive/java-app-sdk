@@ -35,9 +35,9 @@ public class Test {
 
     public static void main(String[] args) throws MqttException, MalformedURLException, URISyntaxException {
 
-        String region = "eu";
-        String appId = "azerty";
-        String accessKey = "azerty";
+        String region = System.getenv("region");
+        String appId = System.getenv("appId");
+        String accessKey = System.getenv("accessKey");
 
         Client client = new Client(region, appId, accessKey);
 
