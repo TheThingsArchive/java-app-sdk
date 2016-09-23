@@ -25,6 +25,8 @@
     
     <scm>
         <url>https://github.com/TheThingsNetwork/java-app-lib</url>
+        <connection>scm:git:git://github.com/TheThingsNetwork/java-app-lib.git</connection>
+        <developerConnection>scm:git:git@github.com:TheThingsNetwork/java-app-lib.git</developerConnection>
     </scm>
     
     
@@ -36,8 +38,7 @@
             <url>https://github.com/cambierr</url>
         </developer>
     </developers>
-    
-    
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -49,6 +50,10 @@
         </repository>
     </distributionManagement>
     
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/TheThingsNetwork/java-app-lib/issues</url>
+    </issueManagement>
     
     <dependencies>
         <dependency>
