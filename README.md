@@ -8,7 +8,7 @@ This is the Java client for [The Things Network](https://www.thethingsnetwork.or
 <dependency>
   <groupId>org.thethingsnetwork</groupId>
   <artifactId>java-app-lib</artifactId>
-  <version>0.1.1</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
