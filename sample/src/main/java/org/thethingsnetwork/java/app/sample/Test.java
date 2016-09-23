@@ -41,8 +41,8 @@ public class Test {
 
         Client client = new Client(region, appId, accessKey);
 
-        client.registerMessageHandler((Message t) -> {
-            System.out.println("New message: " + t);
+        client.registerMessageHandler((String devId, Message t) -> {
+            System.out.println("New message from " + devId + ": " + t);
             // Respond to every third message
             if (t.getInt("counter") % 3 == 0) {
                 try {
@@ -54,14 +54,14 @@ public class Test {
                      * client.send(t.getString("dev_id"), t.getBoolean("led") ? new byte[]{0x00} : new byte[]{0x01}, t.getInt("port"));
                      */
                     System.out.println("Sending: " + response);
-                    client.send(t.getString("dev_id"), response, t.getInt("port"));
+                    client.send(devId, response, t.getInt("port"));
                 } catch (MqttException ex) {
                     System.out.println("Response failed: " + ex.getMessage());
                 }
             }
         });
 
-        client.registerActivationHandler((Message t) -> System.out.println("Activation: " + t));
+        client.registerActivationHandler((String devId, Message t) -> System.out.println("Activation: " + devId + ", data: " + t));
 
         client.registerErrorHandler((Throwable t) -> System.err.println("error: " + t.getMessage()));
 

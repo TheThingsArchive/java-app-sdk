@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Base64;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -58,8 +59,8 @@ public class Client {
      */
     private Consumer<MqttClient> connectHandler;
     private Consumer<Throwable> errorHandler;
-    private Consumer<Message> activationHandler;
-    private Consumer<Message> messageHandler;
+    private BiConsumer<String, Message> activationHandler;
+    private BiConsumer<String, Message> messageHandler;
 
     /**
      * Runtime vars
@@ -152,7 +153,7 @@ public class Client {
      * @param _handler The activation event handler
      * @return the Client instance
      */
-    public Client registerActivationHandler(Consumer<Message> _handler) {
+    public Client registerActivationHandler(BiConsumer<String, Message> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -166,7 +167,7 @@ public class Client {
      * @param _handler The message event handler
      * @return the Client instance
      */
-    public Client registerMessageHandler(Consumer<Message> _handler) {
+    public Client registerMessageHandler(BiConsumer<String, Message> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Can not be called while client is running");
         }
@@ -213,32 +214,36 @@ public class Client {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 String[] tokens = topic.split("\\/");
-                if (tokens.length != 4) {
+                if (tokens.length < 4) {
                     if (errorHandler != null) {
-                        errorHandler.accept(new IllegalArgumentException("Wrong topic received: " + topic));
+                        errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
                     }
                     return;
                 }
                 switch (tokens[3]) {
                     case "up":
                         if (messageHandler != null) {
-                            Message msg = new Message(new String(message.getPayload()));
-                            msg.put("dev_id", tokens[2]);
-                            msg.put("app_id", tokens[0]);
-                            messageHandler.accept(msg);
+                            messageHandler.accept(tokens[2], new Message(new String(message.getPayload())));
                         }
                         break;
-                    case "activations":
-                        if (activationHandler != null) {
-                            Message msg = new Message(new String(message.getPayload()));
-                            msg.put("dev_id", tokens[2]);
-                            msg.put("app_id", tokens[0]);
-                            activationHandler.accept(msg);
+                    case "events":
+                        if (tokens.length > 5) {
+                            switch (tokens[4]) {
+                                case "activations":
+                                    if (activationHandler != null) {
+                                        activationHandler.accept(tokens[2], new Message(new String(message.getPayload())));
+                                    }
+                                    break;
+                                default:
+                                    if (errorHandler != null) {
+                                        errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
+                                    }
+                            }
                         }
                         break;
                     default:
                         if (errorHandler != null) {
-                            errorHandler.accept(new IllegalArgumentException("Wrong topic received: " + topic));
+                            errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
                         }
                 }
             }
