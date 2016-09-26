@@ -8,7 +8,7 @@ This is the Java client for [The Things Network](https://www.thethingsnetwork.or
 <dependency>
   <groupId>org.thethingsnetwork</groupId>
   <artifactId>java-app-lib</artifactId>
-  <version>0.1</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
@@ -29,7 +29,13 @@ A [sample app](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.ja
     mvn clean package install
     ```
 
-5.  Set your region, Application ID and Access Key in [Test.java](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.java).
+5.  export your region, Application ID and Access Key as environment variables.
+
+    ```bash
+    export region="eu"
+    export appId="my-app-id"
+    export accessKey="my-access-key"
+    ```
 6.  Build and run the Test class:
 
     ```bash
