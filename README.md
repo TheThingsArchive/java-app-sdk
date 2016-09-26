@@ -1,8 +1,10 @@
-# The Things Network Java Client [![MAVEN](https://img.shields.io/maven-central/v/org.thethingsnetwork/java-app-lib.svg)](http://mvnrepository.com/artifact/org.thethingsnetwork/java-app-lib)
+# The Things Network Java Client [![Build Status](https://travis-ci.org/TheThingsNetwork/java-app-lib.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/java-app-lib) [![MAVEN](https://img.shields.io/maven-central/v/org.thethingsnetwork/java-app-lib.svg)](http://mvnrepository.com/artifact/org.thethingsnetwork/java-app-lib)
 
 This is the Java client for [The Things Network](https://www.thethingsnetwork.org) to receive activations and messages from IoT devices via The Things Network and send messages as well.
 
-## Maven
+## Maven [![MAVEN](https://img.shields.io/maven-central/v/org.thethingsnetwork/java-app-lib.svg)](http://mvnrepository.com/artifact/org.thethingsnetwork/java-app-lib)
+
+Depend on the artifact via [Maven](http://mvnrepository.com/artifact/org.thethingsnetwork/java-app-lib):
 
 ```xml
 <dependency>
@@ -16,7 +18,7 @@ This is the Java client for [The Things Network](https://www.thethingsnetwork.or
 
 A Quick Start and full API Reference can be found in [The Things Network Documentation](https://www.thethingsnetwork.org/docs/refactor/java/).
 
-## Example
+## Smaple & Test [![Build Status](https://travis-ci.org/TheThingsNetwork/java-app-lib.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/java-app-lib)
 
 A [sample app](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.java) is included. To run:
 
