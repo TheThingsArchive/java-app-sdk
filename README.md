@@ -33,8 +33,8 @@ A [sample app](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.ja
 
     ```bash
     export region="eu"
-    export appId="myAppId"
-    export accessKey="myAccessKey"
+    export appId="my-app-id"
+    export accessKey="myaccesskey"
     ```
 6.  Build and run the Test class:
 
