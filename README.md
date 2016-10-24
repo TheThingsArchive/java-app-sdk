@@ -10,7 +10,7 @@ Depend on the artifact via [Maven](http://mvnrepository.com/artifact/org.thethin
 <dependency>
   <groupId>org.thethingsnetwork</groupId>
   <artifactId>java-app-lib</artifactId>
-  <version>0.2.0</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
