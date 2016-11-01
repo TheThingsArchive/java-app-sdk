@@ -35,6 +35,6 @@ public abstract class ErrorHandler implements EventHandler{
     public abstract void handle(Throwable _error);
     
     @Override
-    public void doSubscribe(MqttClient _mqtt) throws MqttException{}
+    public void getTopic(MqttClient _mqtt) throws MqttException{}
     
 }

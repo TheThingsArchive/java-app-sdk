@@ -35,10 +35,20 @@ public abstract class UplinkHandler implements EventHandler {
 
     public abstract void handle(String _devId, Object _data);
 
+    /**
+     * Add a device filter
+     *
+     * @return the devId we want
+     */
     public String getDevId() {
         return null;
     }
 
+    /**
+     * Add a field filter
+     *
+     * @return the field we want
+     */
     public String getField() {
         return null;
     }
@@ -55,8 +65,8 @@ public abstract class UplinkHandler implements EventHandler {
     }
 
     @Override
-    public void doSubscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/" + ((getDevId() == null) ? "+" : getDevId()) + "/up" + ((getField() == null) ? "" : ("/" + getField())));
+    public void getTopic(MqttClient _mqtt) throws MqttException {
+        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/up" + ((getField() == null) ? "" : ("/" + getField())));
     }
 
 }

@@ -255,6 +255,12 @@ public class Client {
             }
         });
 
+        for (List<EventHandler> ehl : handlers.values()) {
+            for (EventHandler eh : ehl) {
+                eh.getTopic(mqttClient);
+            }
+        }
+
         if (handlers.containsKey(ConnectHandler.class)) {
             for (EventHandler handler : handlers.get(ConnectHandler.class)) {
                 executor.submit(new Runnable() {
@@ -267,11 +273,6 @@ public class Client {
                         }
                     }
                 });
-            }
-        }
-        for (List<EventHandler> ehl : handlers.values()) {
-            for (EventHandler eh : ehl) {
-                eh.doSubscribe(mqttClient);
             }
         }
         return this;

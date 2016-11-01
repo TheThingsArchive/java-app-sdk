@@ -35,6 +35,11 @@ public abstract class ActivationHandler implements EventHandler {
 
     public abstract void handle(String _devId, JSONObject _data);
 
+    /**
+     * Add a device filter
+     *
+     * @return the devId we want
+     */
     public String getDevId() {
         return null;
     }
@@ -44,8 +49,8 @@ public abstract class ActivationHandler implements EventHandler {
     }
 
     @Override
-    public void doSubscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/activations");
+    public void getTopic(MqttClient _mqtt) throws MqttException {
+        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/activations");
     }
 
 }

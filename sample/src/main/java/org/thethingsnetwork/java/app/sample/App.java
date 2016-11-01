@@ -23,20 +23,14 @@
  */
 package org.thethingsnetwork.java.app.sample;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONObject;
 import org.thethingsnetwork.java.app.lib.Client;
-import org.thethingsnetwork.java.app.lib.events.ActivationHandler;
-import org.thethingsnetwork.java.app.lib.events.ConnectHandler;
-import org.thethingsnetwork.java.app.lib.events.ErrorHandler;
-import org.thethingsnetwork.java.app.lib.events.UplinkHandler;
+import org.thethingsnetwork.java.app.lib.events.*;
 
 public class App {
 
-    public static void main(String[] args) throws MqttException, MalformedURLException, URISyntaxException {
+    public static void main(String[] args) throws Exception {
 
         String region = System.getenv("region");
         String appId = System.getenv("appId");
@@ -47,29 +41,23 @@ public class App {
         client.onUplink(new UplinkHandler() {
             @Override
             public void handle(String _devId, Object _data) {
-                System.out.println("New message from " + _devId + ": " + _data);
+
                 try {
                     // Toggle the LED
-                    JSONObject response = new JSONObject().put("led", !(boolean) _data);
+                    JSONObject response = new JSONObject().put("led", !_data.equals("true"));
 
                     /**
                      * If you don't have an encoder payload function:
-                     * client.send(_devId, ((boolean) _data) ? new byte[]{0x00} : new byte[]{0x01}, 0);
+                     * client.send(_devId, _data.equals("true") ? new byte[]{0x00} : new byte[]{0x01}, 0);
                      */
                     System.out.println("Sending: " + response);
                     client.send(_devId, response, 0);
-                } catch (MqttException ex) {
+                } catch (Exception ex) {
                     System.out.println("Response failed: " + ex.getMessage());
                 }
 
             }
 
-            @Override
-            public String getDevId() {
-                return "0102030405060708";
-            }
-
-            @Override
             public String getField() {
                 return "led";
             }
@@ -83,14 +71,12 @@ public class App {
         });
 
         client.onError(new ErrorHandler() {
-            @Override
             public void handle(Throwable _error) {
                 System.err.println("error: " + _error.getMessage());
             }
         });
 
         client.onConnected(new ConnectHandler() {
-            @Override
             public void handle(MqttClient _client) {
                 System.out.println("connected !");
             }
