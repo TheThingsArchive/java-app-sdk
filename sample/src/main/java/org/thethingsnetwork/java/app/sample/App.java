@@ -34,7 +34,7 @@ import org.thethingsnetwork.java.app.lib.events.ConnectHandler;
 import org.thethingsnetwork.java.app.lib.events.ErrorHandler;
 import org.thethingsnetwork.java.app.lib.events.UplinkHandler;
 
-public class Test {
+public class App {
 
     public static void main(String[] args) throws MqttException, MalformedURLException, URISyntaxException {
 
