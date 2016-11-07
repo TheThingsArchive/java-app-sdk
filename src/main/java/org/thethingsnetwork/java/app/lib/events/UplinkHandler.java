@@ -35,23 +35,9 @@ public abstract class UplinkHandler implements EventHandler {
 
     public abstract void handle(String _devId, Object _data);
 
-    /**
-     * Add a device filter
-     *
-     * @return the devId we want
-     */
-    public String getDevId() {
-        return null;
-    }
+    public abstract String getDevId();
 
-    /**
-     * Add a field filter
-     *
-     * @return the field we want
-     */
-    public String getField() {
-        return null;
-    }
+    public abstract String getField();
 
     public boolean matches(String _devId) {
         return getDevId() == null || _devId.equals(getDevId());

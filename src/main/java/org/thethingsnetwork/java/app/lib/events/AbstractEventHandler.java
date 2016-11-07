@@ -35,23 +35,9 @@ public abstract class AbstractEventHandler implements EventHandler {
 
     public abstract void handle(String _devId, String _event, JSONObject _data);
 
-    /**
-     * Add a device filter
-     *
-     * @return the devId we want
-     */
-    public String getDevId() {
-        return null;
-    }
+    public abstract String getDevId();
 
-    /**
-     * Add an event filter
-     *
-     * @return the event we want
-     */
-    public String getEvent() {
-        return null;
-    }
+    public abstract String getEvent();
 
     public boolean matches(String _devId, String _event) {
         if (getDevId() != null && !_devId.equals(getDevId())) {

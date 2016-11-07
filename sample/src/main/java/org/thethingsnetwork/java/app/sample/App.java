@@ -23,10 +23,11 @@
  */
 package org.thethingsnetwork.java.app.sample;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.json.JSONObject;
 import org.thethingsnetwork.java.app.lib.Client;
-import org.thethingsnetwork.java.app.lib.events.*;
 
 public class App {
 
@@ -38,9 +39,9 @@ public class App {
 
         Client client = new Client(region, appId, accessKey);
 
-        client.onUplink(new UplinkHandler() {
+        client.onUplink(new BiConsumer<String, Object>() {
             @Override
-            public void handle(String _devId, Object _data) {
+            public void accept(String _devId, Object _data) {
 
                 try {
                     // Toggle the LED
@@ -57,27 +58,23 @@ public class App {
                 }
 
             }
+        }, null, "led");
 
-            public String getField() {
-                return "led";
-            }
-        });
-
-        client.onActivation(new ActivationHandler() {
+        client.onActivation(new BiConsumer<String, JSONObject>() {
             @Override
-            public void handle(String _devId, JSONObject _data) {
+            public void accept(String _devId, JSONObject _data) {
                 System.out.println("Activation: " + _devId + ", data: " + _data);
             }
         });
 
-        client.onError(new ErrorHandler() {
-            public void handle(Throwable _error) {
+        client.onError(new Consumer<Throwable>() {
+            public void accept(Throwable _error) {
                 System.err.println("error: " + _error.getMessage());
             }
         });
 
-        client.onConnected(new ConnectHandler() {
-            public void handle(MqttClient _client) {
+        client.onConnected(new Consumer<MqttClient>() {
+            public void accept(MqttClient _client) {
                 System.out.println("connected !");
             }
         });
