@@ -57,14 +57,11 @@ public abstract class AbstractEventHandler implements EventHandler {
         if (getDevId() != null && !_devId.equals(getDevId())) {
             return false;
         }
-        if (getEvent() != null && !_event.equals(getEvent())) {
-            return false;
-        }
-        return true;
+        return !(getEvent() != null && !_event.equals(getEvent()));
     }
 
     @Override
-    public void getTopic(MqttClient _mqtt) throws MqttException {
+    public void subscribe(MqttClient _mqtt) throws MqttException {
         _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/" + ((getEvent() == null) ? "+" : getEvent()));
     }
 

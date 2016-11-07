@@ -32,6 +32,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  */
 public interface EventHandler {
     
-    public void getTopic(MqttClient _mqtt) throws MqttException;
+    public void subscribe(MqttClient _mqtt) throws MqttException;
     
 }

@@ -34,6 +34,7 @@ public abstract class ConnectHandler implements EventHandler{
 
     public abstract void handle(MqttClient _client);
     
-    public void getTopic(MqttClient _mqtt) throws MqttException{}
+    @Override
+    public void subscribe(MqttClient _mqtt) throws MqttException{}
 
 }

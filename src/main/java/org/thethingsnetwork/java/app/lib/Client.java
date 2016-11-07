@@ -156,10 +156,10 @@ public class Client {
         mqttClient.connect(connOpts);
         mqttClient.setCallback(new MqttCallback() {
             @Override
-            public void connectionLost(Throwable cause) {
+            public void connectionLost(final Throwable cause) {
                 mqttClient = null;
                 if (handlers.containsKey(ErrorHandler.class)) {
-                    for (EventHandler handler : handlers.get(ErrorHandler.class)) {
+                    for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
                         executor.submit(new Runnable() {
                             @Override
                             public void run() {
@@ -175,15 +175,15 @@ public class Client {
             }
 
             @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                String[] tokens = topic.split("\\/");
+            public void messageArrived(String topic, final MqttMessage message) throws Exception {
+                final String[] tokens = topic.split("\\/");
                 if (tokens.length < 4) {
                     return;
                 }
                 switch (tokens[3]) {
                     case "up":
                         if (handlers.containsKey(UplinkHandler.class)) {
-                            for (EventHandler handler : handlers.get(UplinkHandler.class)) {
+                            for (final EventHandler handler : handlers.get(UplinkHandler.class)) {
                                 executor.submit(new Runnable() {
                                     @Override
                                     public void run() {
@@ -205,7 +205,7 @@ public class Client {
                             switch (tokens[4]) {
                                 case "activations":
                                     if (handlers.containsKey(ActivationHandler.class)) {
-                                        for (EventHandler handler : handlers.get(ActivationHandler.class)) {
+                                        for (final EventHandler handler : handlers.get(ActivationHandler.class)) {
                                             executor.submit(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -224,7 +224,7 @@ public class Client {
                                     break;
                                 default:
                                     if (handlers.containsKey(AbstractEventHandler.class)) {
-                                        for (EventHandler handler : handlers.get(AbstractEventHandler.class)) {
+                                        for (final EventHandler handler : handlers.get(AbstractEventHandler.class)) {
                                             executor.submit(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -257,12 +257,12 @@ public class Client {
 
         for (List<EventHandler> ehl : handlers.values()) {
             for (EventHandler eh : ehl) {
-                eh.getTopic(mqttClient);
+                eh.subscribe(mqttClient);
             }
         }
 
         if (handlers.containsKey(ConnectHandler.class)) {
-            for (EventHandler handler : handlers.get(ConnectHandler.class)) {
+            for (final EventHandler handler : handlers.get(ConnectHandler.class)) {
                 executor.submit(new Runnable() {
                     @Override
                     public void run() {
@@ -374,7 +374,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ConnectHandler.class)) {
-            handlers.put(ConnectHandler.class, new LinkedList<>());
+            handlers.put(ConnectHandler.class, new LinkedList<EventHandler>());
         }
         handlers.get(ConnectHandler.class).add(_handler);
         return this;
@@ -391,7 +391,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ErrorHandler.class)) {
-            handlers.put(ErrorHandler.class, new LinkedList<>());
+            handlers.put(ErrorHandler.class, new LinkedList<EventHandler>());
         }
         handlers.get(ErrorHandler.class).add(_handler);
         return this;
@@ -408,7 +408,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(UplinkHandler.class)) {
-            handlers.put(UplinkHandler.class, new LinkedList<>());
+            handlers.put(UplinkHandler.class, new LinkedList<EventHandler>());
         }
         handlers.get(UplinkHandler.class).add(_handler);
         return this;
@@ -425,7 +425,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ActivationHandler.class)) {
-            handlers.put(ActivationHandler.class, new LinkedList<>());
+            handlers.put(ActivationHandler.class, new LinkedList<EventHandler>());
         }
         handlers.get(ActivationHandler.class).add(_handler);
         return this;
@@ -442,7 +442,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(AbstractEventHandler.class)) {
-            handlers.put(AbstractEventHandler.class, new LinkedList<>());
+            handlers.put(AbstractEventHandler.class, new LinkedList<EventHandler>());
         }
         handlers.get(AbstractEventHandler.class).add(_handler);
         return this;

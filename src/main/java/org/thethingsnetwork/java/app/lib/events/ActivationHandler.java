@@ -49,7 +49,7 @@ public abstract class ActivationHandler implements EventHandler {
     }
 
     @Override
-    public void getTopic(MqttClient _mqtt) throws MqttException {
+    public void subscribe(MqttClient _mqtt) throws MqttException {
         _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/activations");
     }
 
