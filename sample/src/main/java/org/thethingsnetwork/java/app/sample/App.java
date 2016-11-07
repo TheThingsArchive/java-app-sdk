@@ -39,7 +39,7 @@ public class App {
 
         Client client = new Client(region, appId, accessKey);
 
-        client.onUplink(new BiConsumer<String, Object>() {
+        client.onMessage(null, "led", new BiConsumer<String, Object>() {
             @Override
             public void accept(String _devId, Object _data) {
 
@@ -58,7 +58,7 @@ public class App {
                 }
 
             }
-        }, null, "led");
+        });
 
         client.onActivation(new BiConsumer<String, JSONObject>() {
             @Override

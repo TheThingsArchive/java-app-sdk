@@ -436,7 +436,7 @@ public class Client {
      * @param _field the field you want to get
      * @return the Client instance
      */
-    public Client onUplink(final BiConsumer<String, Object> _handler, final String _devId, final String _field) {
+    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -469,8 +469,8 @@ public class Client {
      * @param _devId The devId you want to filter on
      * @return the Client instance
      */
-    public Client onUplink(final BiConsumer<String, Object> _handler, final String _devId) {
-        return onUplink(_handler, _devId, null);
+    public Client onMessage(final String _devId, final BiConsumer<String, Object> _handler) {
+        return onMessage(_devId, null, _handler);
     }
 
     /**
@@ -479,8 +479,8 @@ public class Client {
      * @param _handler The uplink event handler
      * @return the Client instance
      */
-    public Client onUplink(final BiConsumer<String, Object> _handler) {
-        return onUplink(_handler, null, null);
+    public Client onMessage(final BiConsumer<String, Object> _handler) {
+        return onMessage(null, null, _handler);
     }
 
     /**
@@ -490,7 +490,7 @@ public class Client {
      * @param _devId The devId you want to filter on
      * @return the Client instance
      */
-    public Client onActivation(final BiConsumer<String, JSONObject> _handler, final String _devId) {
+    public Client onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -518,7 +518,7 @@ public class Client {
      * @return the Client instance
      */
     public Client onActivation(final BiConsumer<String, JSONObject> _handler) {
-        return onActivation(_handler, null);
+        return onActivation(null, _handler);
     }
 
     /**
@@ -529,7 +529,7 @@ public class Client {
      * @param _event The event you want to filter on
      * @return the Client instance
      */
-    public Client onOtherEvent(final TriConsumer<String, String, JSONObject> _handler, final String _devId, final String _event) {
+    public Client onOtherEvent(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -562,8 +562,8 @@ public class Client {
      * @param _devId The devId you want to filter on
      * @return the Client instance
      */
-    public Client onOtherEvent(final TriConsumer<String, String, JSONObject> _handler, final String _devId) {
-        return onOtherEvent(_handler, _devId, null);
+    public Client onOtherEvent(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
+        return onOtherEvent(_devId, null, _handler);
     }
 
     /**
@@ -572,8 +572,8 @@ public class Client {
      * @param _handler The default event handler
      * @return the Client instance
      */
-    public Client onOtherEvent(final TriConsumer<String, String, JSONObject> _handler) {
-        return onOtherEvent(_handler, null, null);
+    public Client onDevice(final TriConsumer<String, String, JSONObject> _handler) {
+        return onOtherEvent(null, null, _handler);
     }
 
 }

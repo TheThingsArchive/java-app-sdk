@@ -52,7 +52,7 @@ client.onError(new Consumer<Throwable>() {
 Emitted when TTN forwards a message addressed to your application.
 
 ```java
-client.onUplink(new BiConsumer<String, Object>() {
+client.onMessage(new BiConsumer<String, Object>() {
     public void accept(String devId, Object data) {
         System.out.println("Message: " + devId + " " + data);
 });
@@ -91,19 +91,19 @@ client.onUplink(new BiConsumer<String, Object>() {
 ### Listen for a specific device
 
 ```java
-client.onUplink(new BiConsumer<String, Object>() {
+client.onMessage("my-uno", new BiConsumer<String, Object>() {
     public void accept(String devId, Object data) {
         System.out.println("Message: " + devId + " " + data);
-}, "my-uno");
+});
 ```
 
 ### Listen for a specific field (and device)
 
 ```java
-client.onUplink(new BiConsumer<String, Object>() {
+client.onMessage("my-uno", "led", new BiConsumer<String, Object>() {
     public void accept(String devId, Object data) {
         System.out.println("Message: " + devId + " " + data);
-}, "my-uno", "led");
+});
 ```
 
 ## Event: activation
@@ -149,11 +149,11 @@ client.onActivation(new BiConsumer<String, JSONObject>() {
 Emitted when a device event is published.
 
 ```java
-client.onOtherEvent(new TriConsumer<String, String, JSONObject>() {
+client.onDevice(null, "down/scheduled", new TriConsumer<String, String, JSONObject>() {
     public void accept(String devId, String event, JSONObject data) {
         System.out.println("Received event "+event+"for device "+devId);
     }
-}, null, "down/scheduled");
+});
 ```
 
 * `cb.devId [String]`: Device ID, e.g.: `my-uno`.
