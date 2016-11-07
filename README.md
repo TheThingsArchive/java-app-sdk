@@ -42,5 +42,5 @@ A [sample app](sample/src/main/java/org/thethingsnetwork/java/app/sample/Test.ja
 
     ```bash
     cd sample
-    mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.java.app.sample.Test"
+    mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.java.app.sample.App"
     ```
