@@ -23,10 +23,18 @@
  */
 package org.thethingsnetwork.java.app.lib;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -38,6 +46,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
+import org.thethingsnetwork.java.app.lib.events.AbstractEventHandler;
+import org.thethingsnetwork.java.app.lib.events.ActivationHandler;
+import org.thethingsnetwork.java.app.lib.events.ConnectHandler;
+import org.thethingsnetwork.java.app.lib.events.ErrorHandler;
+import org.thethingsnetwork.java.app.lib.events.EventHandler;
+import org.thethingsnetwork.java.app.lib.events.UplinkHandler;
 
 /**
  * This is the base class to be used to interact with The Things Network Handler
@@ -55,12 +69,10 @@ public class Client {
     private final MqttConnectOptions connOpts;
 
     /**
-     * Event handlers
+     * Event settings
      */
-    private Consumer<MqttClient> connectHandler;
-    private Consumer<Throwable> errorHandler;
-    private BiConsumer<String, Message> activationHandler;
-    private BiConsumer<String, Message> messageHandler;
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final Map<Class, List<EventHandler>> handlers = new HashMap<>();
 
     /**
      * Runtime vars
@@ -120,62 +132,6 @@ public class Client {
     }
 
     /**
-     * Register a connection event handler
-     *
-     * @param _handler The connection event handler
-     * @return the Client instance
-     */
-    public Client registerConnectHandler(Consumer<MqttClient> _handler) {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        connectHandler = _handler;
-        return this;
-    }
-
-    /**
-     * Register an error event handler
-     *
-     * @param _handler The error event handler
-     * @return the Client instance
-     */
-    public Client registerErrorHandler(Consumer<Throwable> _handler) {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        errorHandler = _handler;
-        return this;
-    }
-
-    /**
-     * Register an activation event handler
-     *
-     * @param _handler The activation event handler
-     * @return the Client instance
-     */
-    public Client registerActivationHandler(BiConsumer<String, Message> _handler) {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        activationHandler = _handler;
-        return this;
-    }
-
-    /**
-     * Register a message event handler
-     *
-     * @param _handler The message event handler
-     * @return the Client instance
-     */
-    public Client registerMessageHandler(BiConsumer<String, Message> _handler) {
-        if (mqttClient != null) {
-            throw new RuntimeException("Can not be called while client is running");
-        }
-        messageHandler = _handler;
-        return this;
-    }
-
-    /**
      * Change the default Mqtt persistence settings
      *
      * @param _persistence A custom persistence setting
@@ -190,13 +146,12 @@ public class Client {
     }
 
     /**
-     * Start the client and subscribe to provided topics
+     * Start the client
      *
-     * @param _topics The topics to subscribe to
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client start(String... _topics) throws MqttException {
+    public Client start() throws MqttException {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -204,47 +159,94 @@ public class Client {
         mqttClient.connect(connOpts);
         mqttClient.setCallback(new MqttCallback() {
             @Override
-            public void connectionLost(Throwable cause) {
+            public void connectionLost(final Throwable cause) {
                 mqttClient = null;
-                if (errorHandler != null) {
-                    errorHandler.accept(new IOException("Connection lost", cause));
+                if (handlers.containsKey(ErrorHandler.class)) {
+                    for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
+                        executor.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    ((ErrorHandler) handler).handle(cause);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        });
+                    }
                 }
             }
 
             @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                String[] tokens = topic.split("\\/");
+            public void messageArrived(String topic, final MqttMessage message) throws Exception {
+                final String[] tokens = topic.split("\\/");
                 if (tokens.length < 4) {
-                    if (errorHandler != null) {
-                        errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
-                    }
                     return;
                 }
                 switch (tokens[3]) {
                     case "up":
-                        if (messageHandler != null) {
-                            messageHandler.accept(tokens[2], new Message(new String(message.getPayload())));
+                        if (handlers.containsKey(UplinkHandler.class)) {
+                            for (final EventHandler handler : handlers.get(UplinkHandler.class)) {
+                                executor.submit(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            UplinkHandler uh = (UplinkHandler) handler;
+                                            if (uh.matches(tokens[2])) {
+                                                uh.handle(tokens[2], uh.transform(new String(message.getPayload())));
+                                            }
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
                         }
                         break;
                     case "events":
                         if (tokens.length > 5) {
                             switch (tokens[4]) {
                                 case "activations":
-                                    if (activationHandler != null) {
-                                        activationHandler.accept(tokens[2], new Message(new String(message.getPayload())));
+                                    if (handlers.containsKey(ActivationHandler.class)) {
+                                        for (final EventHandler handler : handlers.get(ActivationHandler.class)) {
+                                            executor.submit(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        ActivationHandler ah = (ActivationHandler) handler;
+                                                        if (ah.matches(tokens[2])) {
+                                                            ah.handle(tokens[2], new JSONObject(new String(message.getPayload())));
+                                                        }
+                                                    } catch (Exception ex) {
+                                                        ex.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                        }
                                     }
                                     break;
                                 default:
-                                    if (errorHandler != null) {
-                                        errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
+                                    if (handlers.containsKey(AbstractEventHandler.class)) {
+                                        for (final EventHandler handler : handlers.get(AbstractEventHandler.class)) {
+                                            executor.submit(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        AbstractEventHandler aeh = (AbstractEventHandler) handler;
+                                                        String event = concat(4, tokens);
+                                                        if (aeh.matches(tokens[2], event)) {
+                                                            aeh.handle(tokens[2], event, new JSONObject(new String(message.getPayload())));
+                                                        }
+                                                    } catch (Exception ex) {
+                                                        ex.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                        }
                                     }
                             }
                         }
                         break;
-                    default:
-                        if (errorHandler != null) {
-                            errorHandler.accept(new IllegalArgumentException("Unknown topic received: " + topic));
-                        }
                 }
             }
 
@@ -255,21 +257,36 @@ public class Client {
                  */
             }
         });
-        if (connectHandler != null) {
-            connectHandler.accept(mqttClient);
+
+        for (List<EventHandler> ehl : handlers.values()) {
+            for (EventHandler eh : ehl) {
+                eh.subscribe(mqttClient);
+            }
         }
-        mqttClient.subscribe(_topics);
+
+        if (handlers.containsKey(ConnectHandler.class)) {
+            for (final EventHandler handler : handlers.get(ConnectHandler.class)) {
+                executor.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((ConnectHandler) handler).handle(mqttClient);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
         return this;
     }
 
-    /**
-     * Start the client and subscribe to activations and uplink
-     *
-     * @return the Client instance
-     * @throws MqttException in case something goes wrong
-     */
-    public Client start() throws MqttException {
-        return start("+/devices/+/activations", "+/devices/+/up");
+    private String concat(int _ignore, String[] _tokens) {
+        StringJoiner sj = new StringJoiner("/");
+        for (int i = _ignore; i < _tokens.length; i++) {
+            sj.add(_tokens[i]);
+        }
+        return sj.toString();
     }
 
     /**
@@ -278,7 +295,7 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client end() throws MqttException {
+    public Client end() throws MqttException, InterruptedException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
         }
@@ -292,10 +309,11 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client end(long _timeout) throws MqttException {
+    public Client end(long _timeout) throws MqttException, InterruptedException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
         }
+        executor.awaitTermination(_timeout, TimeUnit.MILLISECONDS);
         mqttClient.disconnect(_timeout);
         if (!mqttClient.isConnected()) {
             mqttClient = null;
@@ -346,6 +364,216 @@ public class Client {
         data.put("payload_fields", _payload);
         data.put("port", _port != 0 ? _port : 1);
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
+    }
+
+    /**
+     * Send a downlink message using pre-registered encoder
+     *
+     * @param _devId The devId (devEUI for staging) to send the message to
+     * @param _payload The payload to be sent
+     * @param _port The port to use for the message
+     * @throws MqttException in case something goes wrong
+     */
+    public void send(String _devId, ByteBuffer _payload, int _port) throws MqttException {
+        JSONObject data = new JSONObject();
+        _payload.rewind();
+        byte[] payload = new byte[_payload.capacity() - _payload.remaining()];
+        _payload.get(payload);
+        data.put("payload_fields", Base64.getEncoder().encodeToString(payload));
+        data.put("port", _port != 0 ? _port : 1);
+        mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
+    }
+
+    /**
+     * Register a connection event handler
+     *
+     * @param _handler The connection event handler
+     * @return the Client instance
+     */
+    public Client onConnected(final Consumer<MqttClient> _handler) {
+        if (mqttClient != null) {
+            throw new RuntimeException("Already connected");
+        }
+        if (!handlers.containsKey(ConnectHandler.class)) {
+            handlers.put(ConnectHandler.class, new LinkedList<EventHandler>());
+        }
+        handlers.get(ConnectHandler.class).add(new ConnectHandler() {
+            @Override
+            public void handle(MqttClient _client) {
+                _handler.accept(_client);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Register an error event handler
+     *
+     * @param _handler The error event handler
+     * @return the Client instance
+     */
+    public Client onError(final Consumer<Throwable> _handler) {
+        if (mqttClient != null) {
+            throw new RuntimeException("Already connected");
+        }
+        if (!handlers.containsKey(ErrorHandler.class)) {
+            handlers.put(ErrorHandler.class, new LinkedList<EventHandler>());
+        }
+        handlers.get(ErrorHandler.class).add(new ErrorHandler() {
+            @Override
+            public void handle(Throwable _error) {
+                _handler.accept(_error);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Register an uplink event handler
+     *
+     * @param _handler The uplink event handler
+     * @param _devId The devId you want to filter on
+     * @param _field the field you want to get
+     * @return the Client instance
+     */
+    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) {
+        if (mqttClient != null) {
+            throw new RuntimeException("Already connected");
+        }
+        if (!handlers.containsKey(UplinkHandler.class)) {
+            handlers.put(UplinkHandler.class, new LinkedList<EventHandler>());
+        }
+        handlers.get(UplinkHandler.class).add(new UplinkHandler() {
+            @Override
+            public void handle(String _devId, Object _data) {
+                _handler.accept(_devId, _data);
+            }
+
+            @Override
+            public String getDevId() {
+                return _devId;
+            }
+
+            @Override
+            public String getField() {
+                return _field;
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Register an uplink event handler
+     *
+     * @param _handler The uplink event handler
+     * @param _devId The devId you want to filter on
+     * @return the Client instance
+     */
+    public Client onMessage(final String _devId, final BiConsumer<String, Object> _handler) {
+        return onMessage(_devId, null, _handler);
+    }
+
+    /**
+     * Register an uplink event handler
+     *
+     * @param _handler The uplink event handler
+     * @return the Client instance
+     */
+    public Client onMessage(final BiConsumer<String, Object> _handler) {
+        return onMessage(null, null, _handler);
+    }
+
+    /**
+     * Register an activation event handler
+     *
+     * @param _handler The activation event handler
+     * @param _devId The devId you want to filter on
+     * @return the Client instance
+     */
+    public Client onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) {
+        if (mqttClient != null) {
+            throw new RuntimeException("Already connected");
+        }
+        if (!handlers.containsKey(ActivationHandler.class)) {
+            handlers.put(ActivationHandler.class, new LinkedList<EventHandler>());
+        }
+        handlers.get(ActivationHandler.class).add(new ActivationHandler() {
+            @Override
+            public void handle(String _devId, JSONObject _data) {
+                _handler.accept(_devId, _data);
+            }
+
+            @Override
+            public String getDevId() {
+                return _devId;
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Register an activation event handler
+     *
+     * @param _handler The activation event handler
+     * @return the Client instance
+     */
+    public Client onActivation(final BiConsumer<String, JSONObject> _handler) {
+        return onActivation(null, _handler);
+    }
+
+    /**
+     * Register a default event handler
+     *
+     * @param _handler The default event handler
+     * @param _devId The devId you want to filter on
+     * @param _event The event you want to filter on
+     * @return the Client instance
+     */
+    public Client onOtherEvent(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
+        if (mqttClient != null) {
+            throw new RuntimeException("Already connected");
+        }
+        if (!handlers.containsKey(AbstractEventHandler.class)) {
+            handlers.put(AbstractEventHandler.class, new LinkedList<EventHandler>());
+        }
+        handlers.get(AbstractEventHandler.class).add(new AbstractEventHandler() {
+            @Override
+            public void handle(String _devId, String _event, JSONObject _data) {
+                _handler.accept(_devId, _event, _data);
+            }
+
+            @Override
+            public String getDevId() {
+                return _devId;
+            }
+
+            @Override
+            public String getEvent() {
+                return _event;
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Register a default event handler
+     *
+     * @param _handler The default event handler
+     * @param _devId The devId you want to filter on
+     * @return the Client instance
+     */
+    public Client onOtherEvent(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
+        return onOtherEvent(_devId, null, _handler);
+    }
+
+    /**
+     * Register a default event handler
+     *
+     * @param _handler The default event handler
+     * @return the Client instance
+     */
+    public Client onDevice(final TriConsumer<String, String, JSONObject> _handler) {
+        return onOtherEvent(null, null, _handler);
     }
 
 }

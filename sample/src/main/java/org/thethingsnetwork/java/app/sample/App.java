@@ -23,17 +23,15 @@
  */
 package org.thethingsnetwork.java.app.sample;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONObject;
 import org.thethingsnetwork.java.app.lib.Client;
-import org.thethingsnetwork.java.app.lib.Message;
 
-public class Test {
+public class App {
 
-    public static void main(String[] args) throws MqttException, MalformedURLException, URISyntaxException {
+    public static void main(String[] args) throws Exception {
 
         String region = System.getenv("region");
         String appId = System.getenv("appId");
@@ -41,31 +39,45 @@ public class Test {
 
         Client client = new Client(region, appId, accessKey);
 
-        client.registerMessageHandler((String devId, Message t) -> {
-            System.out.println("New message from " + devId + ": " + t);
-            // Respond to every third message
-            if (t.getInt("counter") % 3 == 0) {
+        client.onMessage(null, "led", new BiConsumer<String, Object>() {
+            @Override
+            public void accept(String _devId, Object _data) {
+
                 try {
                     // Toggle the LED
-                    JSONObject response = new JSONObject().put("led", !t.getBoolean("led"));
+                    JSONObject response = new JSONObject().put("led", !_data.equals("true"));
 
                     /**
                      * If you don't have an encoder payload function:
-                     * client.send(t.getString("dev_id"), t.getBoolean("led") ? new byte[]{0x00} : new byte[]{0x01}, t.getInt("port"));
+                     * client.send(_devId, _data.equals("true") ? new byte[]{0x00} : new byte[]{0x01}, 0);
                      */
                     System.out.println("Sending: " + response);
-                    client.send(devId, response, t.getInt("port"));
-                } catch (MqttException ex) {
+                    client.send(_devId, response, 0);
+                } catch (Exception ex) {
                     System.out.println("Response failed: " + ex.getMessage());
                 }
+
             }
         });
 
-        client.registerActivationHandler((String devId, Message t) -> System.out.println("Activation: " + devId + ", data: " + t));
+        client.onActivation(new BiConsumer<String, JSONObject>() {
+            @Override
+            public void accept(String _devId, JSONObject _data) {
+                System.out.println("Activation: " + _devId + ", data: " + _data);
+            }
+        });
 
-        client.registerErrorHandler((Throwable t) -> System.err.println("error: " + t.getMessage()));
+        client.onError(new Consumer<Throwable>() {
+            public void accept(Throwable _error) {
+                System.err.println("error: " + _error.getMessage());
+            }
+        });
 
-        client.registerConnectHandler((MqttClient t) -> System.out.println("connected !"));
+        client.onConnected(new Consumer<MqttClient>() {
+            public void accept(MqttClient _client) {
+                System.out.println("connected !");
+            }
+        });
 
         client.start();
     }
