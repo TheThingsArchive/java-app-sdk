@@ -8,4 +8,7 @@
     </parent>
     <artifactId>samples</artifactId>
     <packaging>pom</packaging>
+    
+    <name>The Things Network SDK Samples</name>
+    <description>The Things Network SDK Samples</description>
 </project>
