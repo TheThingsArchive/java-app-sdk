@@ -21,29 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib.events;
+package org.thethingsnetwork.handler.message.mqtt.events;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.json.JSONObject;
 
 /**
  *
  * @author Romain Cambier
  */
-public abstract class ActivationHandler implements EventHandler {
-
-    public abstract void handle(String _devId, JSONObject _data);
-
-    public abstract String getDevId();
-
-    public boolean matches(String _devId) {
-        return getDevId() == null || _devId.equals(getDevId());
-    }
-
+public abstract class ErrorHandler implements EventHandler{
+    
+    public abstract void handle(Throwable _error);
+    
     @Override
-    public void subscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/activations");
-    }
-
+    public void subscribe(MqttClient _mqtt) throws MqttException{}
+    
 }

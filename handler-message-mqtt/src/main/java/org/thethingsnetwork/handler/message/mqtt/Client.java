@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib;
+package org.thethingsnetwork.handler.message.mqtt;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,12 +46,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
-import org.thethingsnetwork.java.app.lib.events.AbstractEventHandler;
-import org.thethingsnetwork.java.app.lib.events.ActivationHandler;
-import org.thethingsnetwork.java.app.lib.events.ConnectHandler;
-import org.thethingsnetwork.java.app.lib.events.ErrorHandler;
-import org.thethingsnetwork.java.app.lib.events.EventHandler;
-import org.thethingsnetwork.java.app.lib.events.UplinkHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.AbstractEventHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.ActivationHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.ConnectHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.ErrorHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.EventHandler;
+import org.thethingsnetwork.handler.message.mqtt.events.UplinkHandler;
 
 /**
  * This is the base class to be used to interact with The Things Network Handler

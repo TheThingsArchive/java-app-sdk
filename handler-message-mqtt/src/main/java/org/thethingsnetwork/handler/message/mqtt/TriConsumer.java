@@ -15,7 +15,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Shareif.com SPRL.
  */
-package org.thethingsnetwork.java.app.lib;
+package org.thethingsnetwork.handler.message.mqtt;
 
 /**
  *

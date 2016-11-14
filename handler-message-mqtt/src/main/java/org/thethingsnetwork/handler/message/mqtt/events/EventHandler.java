@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib.events;
+package org.thethingsnetwork.handler.message.mqtt.events;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -30,11 +30,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  *
  * @author Romain Cambier
  */
-public abstract class ErrorHandler implements EventHandler{
+public interface EventHandler {
     
-    public abstract void handle(Throwable _error);
-    
-    @Override
-    public void subscribe(MqttClient _mqtt) throws MqttException{}
+    public void subscribe(MqttClient _mqtt) throws MqttException;
     
 }

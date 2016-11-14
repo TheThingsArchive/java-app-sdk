@@ -21,29 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib;
+package org.thethingsnetwork.handler.message.mqtt.events;
 
-import java.util.Base64;
-import org.json.JSONException;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONObject;
 
 /**
- * This is a wrapper class for JSONObject to provide support for base64 encoded payload
  *
  * @author Romain Cambier
  */
-public class Message extends JSONObject {
+public abstract class ActivationHandler implements EventHandler {
 
-    public byte[] getBinary(String _key) {
-        Object object = get(_key);
-        if (object instanceof String) {
-            return Base64.getDecoder().decode((String) object);
-        }
-        throw new JSONException("JSONObject[" + quote(_key) + "] is not a base64 decodable string.");
+    public abstract void handle(String _devId, JSONObject _data);
+
+    public abstract String getDevId();
+
+    public boolean matches(String _devId) {
+        return getDevId() == null || _devId.equals(getDevId());
     }
 
-    public Message(String _source) {
-        super(_source);
+    @Override
+    public void subscribe(MqttClient _mqtt) throws MqttException {
+        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/activations");
     }
 
 }

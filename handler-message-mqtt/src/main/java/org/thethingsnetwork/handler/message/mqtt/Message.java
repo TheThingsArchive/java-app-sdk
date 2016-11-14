@@ -21,38 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib.events;
+package org.thethingsnetwork.handler.message.mqtt;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.thethingsnetwork.java.app.lib.Message;
+import java.util.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
+ * This is a wrapper class for JSONObject to provide support for base64 encoded payload
  *
  * @author Romain Cambier
  */
-public abstract class UplinkHandler implements EventHandler {
+public class Message extends JSONObject {
 
-    public abstract void handle(String _devId, Object _data);
-
-    public abstract String getDevId();
-
-    public abstract String getField();
-
-    public boolean matches(String _devId) {
-        return getDevId() == null || _devId.equals(getDevId());
-    }
-
-    public Object transform(String _data) {
-        if (getField() == null) {
-            return new Message(_data);
+    public byte[] getBinary(String _key) {
+        Object object = get(_key);
+        if (object instanceof String) {
+            return Base64.getDecoder().decode((String) object);
         }
-        return _data;
+        throw new JSONException("JSONObject[" + quote(_key) + "] is not a base64 decodable string.");
     }
 
-    @Override
-    public void subscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/up" + ((getField() == null) ? "" : ("/" + getField())));
+    public Message(String _source) {
+        super(_source);
     }
 
 }

@@ -21,34 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.java.app.lib.events;
+package org.thethingsnetwork.handler.message.mqtt.events;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.json.JSONObject;
+import org.thethingsnetwork.handler.message.mqtt.Message;
 
 /**
  *
  * @author Romain Cambier
  */
-public abstract class AbstractEventHandler implements EventHandler {
+public abstract class UplinkHandler implements EventHandler {
 
-    public abstract void handle(String _devId, String _event, JSONObject _data);
+    public abstract void handle(String _devId, Object _data);
 
     public abstract String getDevId();
 
-    public abstract String getEvent();
+    public abstract String getField();
 
-    public boolean matches(String _devId, String _event) {
-        if (getDevId() != null && !_devId.equals(getDevId())) {
-            return false;
+    public boolean matches(String _devId) {
+        return getDevId() == null || _devId.equals(getDevId());
+    }
+
+    public Object transform(String _data) {
+        if (getField() == null) {
+            return new Message(_data);
         }
-        return !(getEvent() != null && !_event.equals(getEvent()));
+        return _data;
     }
 
     @Override
     public void subscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/events/" + ((getEvent() == null) ? "+" : getEvent()));
+        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/up" + ((getField() == null) ? "" : ("/" + getField())));
     }
 
 }
