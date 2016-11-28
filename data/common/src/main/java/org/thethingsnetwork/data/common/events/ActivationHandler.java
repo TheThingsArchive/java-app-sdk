@@ -21,38 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.handler.message.mqtt.events;
+package org.thethingsnetwork.data.common.events;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.thethingsnetwork.handler.message.mqtt.Message;
+import org.json.JSONObject;
+import org.thethingsnetwork.data.common.Subscribable;
 
 /**
  *
  * @author Romain Cambier
  */
-public abstract class UplinkHandler implements EventHandler {
+public abstract class ActivationHandler implements EventHandler {
 
-    public abstract void handle(String _devId, Object _data);
+    public abstract void handle(String _devId, JSONObject _data);
 
     public abstract String getDevId();
-
-    public abstract String getField();
 
     public boolean matches(String _devId) {
         return getDevId() == null || _devId.equals(getDevId());
     }
 
-    public Object transform(String _data) {
-        if (getField() == null) {
-            return new Message(_data);
-        }
-        return _data;
-    }
-
     @Override
-    public void subscribe(MqttClient _mqtt) throws MqttException {
-        _mqtt.subscribe("+/+/" + ((getDevId() == null) ? "+" : getDevId()) + "/up" + ((getField() == null) ? "" : ("/" + getField())));
+    public void subscribe(Subscribable _client) throws Exception {
+        _client.subscibe(new String[]{
+            _client.getWordWildcard(),
+            _client.getWordWildcard(),
+            (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
+            "events",
+            "activations"
+        });
     }
 
 }

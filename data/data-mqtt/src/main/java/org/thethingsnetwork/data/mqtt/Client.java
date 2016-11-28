@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.handler.message.mqtt;
+package org.thethingsnetwork.data.mqtt;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,12 +46,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
-import org.thethingsnetwork.handler.message.mqtt.events.AbstractEventHandler;
-import org.thethingsnetwork.handler.message.mqtt.events.ActivationHandler;
-import org.thethingsnetwork.handler.message.mqtt.events.ConnectHandler;
-import org.thethingsnetwork.handler.message.mqtt.events.ErrorHandler;
-import org.thethingsnetwork.handler.message.mqtt.events.EventHandler;
-import org.thethingsnetwork.handler.message.mqtt.events.UplinkHandler;
+import org.thethingsnetwork.data.common.Connection;
+import org.thethingsnetwork.data.common.Subscribable;
+import org.thethingsnetwork.data.common.TriConsumer;
+import org.thethingsnetwork.data.common.events.AbstractEventHandler;
+import org.thethingsnetwork.data.common.events.ActivationHandler;
+import org.thethingsnetwork.data.common.events.ConnectHandler;
+import org.thethingsnetwork.data.common.events.ErrorHandler;
+import org.thethingsnetwork.data.common.events.EventHandler;
+import org.thethingsnetwork.data.common.events.UplinkHandler;
 
 /**
  * This is the base class to be used to interact with The Things Network Handler
@@ -116,16 +119,21 @@ public class Client {
 
         URI tempBroker = new URI(_source.contains(".") ? _source : (_source + ".thethings.network"));
 
-        if ("tcp".equals(tempBroker.getScheme())) {
-            if (tempBroker.getPort() == -1) {
-                return tempBroker.toString() + ":1883";
+        if (null != tempBroker.getScheme()) {
+            switch (tempBroker.getScheme()) {
+                case "tcp":
+                    if (tempBroker.getPort() == -1) {
+                        return tempBroker.toString() + ":1883";
+                    }
+                    break;
+                case "ssl":
+                    if (tempBroker.getPort() == -1) {
+                        return tempBroker.toString() + ":8883";
+                    }
+                    break;
+                default:
+                    return "tcp://" + tempBroker.getPath() + ":1883";
             }
-        } else if ("ssl".equals(tempBroker.getScheme())) {
-            if (tempBroker.getPort() == -1) {
-                return tempBroker.toString() + ":8883";
-            }
-        } else {
-            return "tcp://" + tempBroker.getPath() + ":1883";
         }
 
         return tempBroker.toString();
@@ -151,7 +159,7 @@ public class Client {
      * @return the Client instance
      * @throws MqttException in case something goes wrong
      */
-    public Client start() throws MqttException {
+    public Client start() throws MqttException, Exception {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -166,11 +174,7 @@ public class Client {
                         executor.submit(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    ((ErrorHandler) handler).handle(cause);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
+                                ((ErrorHandler) handler).safelyHandle(cause);
                             }
                         });
                     }
@@ -195,8 +199,17 @@ public class Client {
                                             if (uh.matches(tokens[2])) {
                                                 uh.handle(tokens[2], uh.transform(new String(message.getPayload())));
                                             }
-                                        } catch (Exception ex) {
-                                            ex.printStackTrace();
+                                        } catch (final Exception ex) {
+                                            if (handlers.containsKey(ErrorHandler.class)) {
+                                                for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
+                                                    executor.submit(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            ((ErrorHandler) handler).safelyHandle(ex);
+                                                        }
+                                                    });
+                                                }
+                                            }
                                         }
                                     }
                                 });
@@ -217,8 +230,17 @@ public class Client {
                                                         if (ah.matches(tokens[2])) {
                                                             ah.handle(tokens[2], new JSONObject(new String(message.getPayload())));
                                                         }
-                                                    } catch (Exception ex) {
-                                                        ex.printStackTrace();
+                                                    } catch (final Exception ex) {
+                                                        if (handlers.containsKey(ErrorHandler.class)) {
+                                                            for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
+                                                                executor.submit(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        ((ErrorHandler) handler).safelyHandle(ex);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             });
@@ -237,8 +259,17 @@ public class Client {
                                                         if (aeh.matches(tokens[2], event)) {
                                                             aeh.handle(tokens[2], event, new JSONObject(new String(message.getPayload())));
                                                         }
-                                                    } catch (Exception ex) {
-                                                        ex.printStackTrace();
+                                                    } catch (final Exception ex) {
+                                                        if (handlers.containsKey(ErrorHandler.class)) {
+                                                            for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
+                                                                executor.submit(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        ((ErrorHandler) handler).safelyHandle(ex);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             });
@@ -260,7 +291,30 @@ public class Client {
 
         for (List<EventHandler> ehl : handlers.values()) {
             for (EventHandler eh : ehl) {
-                eh.subscribe(mqttClient);
+                eh.subscribe(new Subscribable() {
+
+                    private static final String WILDCARD_WORD = "+";
+                    private static final String WILDCARD_PATH = "#";
+
+                    @Override
+                    public void subscibe(String[] _key) throws Exception {
+                        StringJoiner sj = new StringJoiner("/");
+                        for (String key : _key) {
+                            sj.add(key);
+                        }
+                        mqttClient.subscribe(sj.toString());
+                    }
+
+                    @Override
+                    public String getWordWildcard() {
+                        return WILDCARD_WORD;
+                    }
+
+                    @Override
+                    public String getPathWildcard() {
+                        return WILDCARD_PATH;
+                    }
+                });
             }
         }
 
@@ -270,9 +324,23 @@ public class Client {
                     @Override
                     public void run() {
                         try {
-                            ((ConnectHandler) handler).handle(mqttClient);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
+                            ((ConnectHandler) handler).handle(new Connection() {
+                                @Override
+                                public Object get() {
+                                    return mqttClient;
+                                }
+                            });
+                        } catch (final Exception ex) {
+                            if (handlers.containsKey(ErrorHandler.class)) {
+                                for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
+                                    executor.submit(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((ErrorHandler) handler).safelyHandle(ex);
+                                        }
+                                    });
+                                }
+                            }
                         }
                     }
                 });
@@ -390,7 +458,7 @@ public class Client {
      * @param _handler The connection event handler
      * @return the Client instance
      */
-    public Client onConnected(final Consumer<MqttClient> _handler) {
+    public Client onConnected(final Consumer<Connection> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -399,7 +467,7 @@ public class Client {
         }
         handlers.get(ConnectHandler.class).add(new ConnectHandler() {
             @Override
-            public void handle(MqttClient _client) {
+            public void handle(Connection _client) {
                 _handler.accept(_client);
             }
         });

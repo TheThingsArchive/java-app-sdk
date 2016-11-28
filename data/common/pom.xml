@@ -3,25 +3,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.thethingsnetwork</groupId>
-        <artifactId>app-sdk</artifactId>
+        <artifactId>data</artifactId>
         <version>1.1.0</version>
     </parent>
-    <artifactId>handler-message-amqp</artifactId>
+    <groupId>org.thethingsnetwork.data</groupId>
+    <artifactId>common</artifactId>
     <packaging>jar</packaging>
     
-    <name>The Things Network AMQP Client</name>
-    <description>The Things Network AMQP Client</description>
-    
+    <name>The Things Network Data SDK helpers</name>
+    <description>The Things Network Data SDK helpers</description>
     <dependencies>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20160810</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>3.6.5</version>
         </dependency>
     </dependencies>
 </project>

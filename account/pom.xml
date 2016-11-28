@@ -9,6 +9,6 @@
     <artifactId>account</artifactId>
     <packaging>jar</packaging>
     
-    <name>The Things Network Account API Client</name>
+    <name>The Things Network Account SDK</name>
     <description>The Things Network Account API Client</description>
 </project>

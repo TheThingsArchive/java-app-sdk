@@ -21,29 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.handler.message.mqtt;
+package org.thethingsnetwork.data.common.events;
 
-import java.util.Base64;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.thethingsnetwork.data.common.Subscribable;
 
 /**
- * This is a wrapper class for JSONObject to provide support for base64 encoded payload
  *
  * @author Romain Cambier
  */
-public class Message extends JSONObject {
+public abstract class AbstractEventHandler implements EventHandler {
 
-    public byte[] getBinary(String _key) {
-        Object object = get(_key);
-        if (object instanceof String) {
-            return Base64.getDecoder().decode((String) object);
+    public abstract void handle(String _devId, String _event, JSONObject _data);
+
+    public abstract String getDevId();
+
+    public abstract String getEvent();
+
+    public boolean matches(String _devId, String _event) {
+        if (getDevId() != null && !_devId.equals(getDevId())) {
+            return false;
         }
-        throw new JSONException("JSONObject[" + quote(_key) + "] is not a base64 decodable string.");
+        return !(getEvent() != null && !_event.equals(getEvent()));
     }
 
-    public Message(String _source) {
-        super(_source);
+    @Override
+    public void subscribe(Subscribable _client) throws Exception {
+        _client.subscibe(new String[]{
+            _client.getWordWildcard(),
+            _client.getWordWildcard(),
+            (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
+            "events",
+            (getEvent() == null) ? _client.getWordWildcard() : getEvent()
+        });
     }
 
 }

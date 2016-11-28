@@ -10,3 +10,9 @@
 /samples/target/
 /account/target/
 /handler-manage/target/
+/data-mqtt/target/
+/data-amqp/target/
+/data/data-amqp/target/
+/data/data-mqtt/target/
+/management/target/
+/data/common/target/

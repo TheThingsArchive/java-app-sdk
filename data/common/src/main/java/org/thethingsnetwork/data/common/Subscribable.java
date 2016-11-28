@@ -21,20 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.handler.message.mqtt.events;
-
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
+package org.thethingsnetwork.data.common;
 
 /**
  *
  * @author Romain Cambier
  */
-public abstract class ConnectHandler implements EventHandler{
+public interface Subscribable {
 
-    public abstract void handle(MqttClient _client);
-    
-    @Override
-    public void subscribe(MqttClient _mqtt) throws MqttException{}
+    public void subscibe(String[] _key) throws Exception;
+
+    public String getWordWildcard();
+
+    public String getPathWildcard();
 
 }

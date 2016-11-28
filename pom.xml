@@ -7,11 +7,10 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>handler-message-mqtt</module>
-        <module>handler-message-amqp</module>
         <module>samples</module>
-        <module>handler-manage</module>
         <module>account</module>
+        <module>data</module>
+        <module>management</module>
     </modules>
     
     <name>The Things Network Java SDK</name>
