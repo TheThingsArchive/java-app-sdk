@@ -10,12 +10,8 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>samples</module>
-        <module>handler-manage</module>
-        <module>account</module>
-        <module>data-mqtt</module>
-        <module>data-amqp</module>
-        <module>data</module>
+        <module>mqtt</module>
+        <module>amqp</module>
         <module>common</module>
     </modules>
     

@@ -18,3 +18,4 @@
 /data/common/target/
 /data/amqp/target/
 /data/mqtt/target/
+/data/target/
