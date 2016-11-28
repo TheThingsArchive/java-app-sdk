@@ -16,3 +16,5 @@
 /data/data-mqtt/target/
 /management/target/
 /data/common/target/
+/data/amqp/target/
+/data/mqtt/target/
