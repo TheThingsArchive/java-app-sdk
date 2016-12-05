@@ -124,7 +124,7 @@ public class Client {
      * Start the client
      *
      * @return the Client instance
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception in case something went wrong
      */
     public Client start() throws Exception {
         if (connection != null) {
@@ -145,30 +145,24 @@ public class Client {
                 switch (tokens[3]) {
                     case "up":
                         if (handlers.containsKey(UplinkHandler.class)) {
-                            for (final EventHandler handler : handlers.get(UplinkHandler.class)) {
-                                executor.submit(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            UplinkHandler uh = (UplinkHandler) handler;
-                                            if (uh.matches(tokens[2])) {
-                                                uh.handle(tokens[2], uh.transform(new String(body)));
-                                            }
-                                        } catch (final Exception ex) {
-                                            if (handlers.containsKey(ErrorHandler.class)) {
-                                                for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
-                                                    executor.submit(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            ((ErrorHandler) handler).safelyHandle(ex);
-                                                        }
-                                                    });
-                                                }
-                                            }
+                            handlers.get(UplinkHandler.class).stream().forEach((handler) -> {
+                                executor.submit(() -> {
+                                    try {
+                                        UplinkHandler uh = (UplinkHandler) handler;
+                                        if (uh.matches(tokens[2])) {
+                                            uh.handle(tokens[2], uh.transform(new String(body)));
+                                        }
+                                    } catch (final Exception ex) {
+                                        if (handlers.containsKey(ErrorHandler.class)) {
+                                            handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
+                                                executor.submit(() -> {
+                                                    ((ErrorHandler) handler1).safelyHandle(ex);
+                                                });
+                                            });
                                         }
                                     }
                                 });
-                            }
+                            });
                         }
                         break;
                     case "events":
@@ -176,59 +170,47 @@ public class Client {
                             switch (tokens[4]) {
                                 case "activations":
                                     if (handlers.containsKey(ActivationHandler.class)) {
-                                        for (final EventHandler handler : handlers.get(ActivationHandler.class)) {
-                                            executor.submit(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        ActivationHandler ah = (ActivationHandler) handler;
-                                                        if (ah.matches(tokens[2])) {
-                                                            ah.handle(tokens[2], new JSONObject(new String(body)));
-                                                        }
-                                                    } catch (final Exception ex) {
-                                                        if (handlers.containsKey(ErrorHandler.class)) {
-                                                            for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
-                                                                executor.submit(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        ((ErrorHandler) handler).safelyHandle(ex);
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
+                                        handlers.get(ActivationHandler.class).stream().forEach((handler) -> {
+                                            executor.submit(() -> {
+                                                try {
+                                                    ActivationHandler ah = (ActivationHandler) handler;
+                                                    if (ah.matches(tokens[2])) {
+                                                        ah.handle(tokens[2], new JSONObject(new String(body)));
+                                                    }
+                                                } catch (final Exception ex) {
+                                                    if (handlers.containsKey(ErrorHandler.class)) {
+                                                        handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
+                                                            executor.submit(() -> {
+                                                                ((ErrorHandler) handler1).safelyHandle(ex);
+                                                            });
+                                                        });
                                                     }
                                                 }
                                             });
-                                        }
+                                        });
                                     }
                                     break;
                                 default:
                                     if (handlers.containsKey(AbstractEventHandler.class)) {
-                                        for (final EventHandler handler : handlers.get(AbstractEventHandler.class)) {
-                                            executor.submit(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        AbstractEventHandler aeh = (AbstractEventHandler) handler;
-                                                        String event = concat(4, tokens);
-                                                        if (aeh.matches(tokens[2], event)) {
-                                                            aeh.handle(tokens[2], event, new JSONObject(new String(body)));
-                                                        }
-                                                    } catch (final Exception ex) {
-                                                        if (handlers.containsKey(ErrorHandler.class)) {
-                                                            for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
-                                                                executor.submit(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        ((ErrorHandler) handler).safelyHandle(ex);
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
+                                        handlers.get(AbstractEventHandler.class).stream().forEach((handler) -> {
+                                            executor.submit(() -> {
+                                                try {
+                                                    AbstractEventHandler aeh = (AbstractEventHandler) handler;
+                                                    String event = concat(4, tokens);
+                                                    if (aeh.matches(tokens[2], event)) {
+                                                        aeh.handle(tokens[2], event, new JSONObject(new String(body)));
+                                                    }
+                                                } catch (final Exception ex) {
+                                                    if (handlers.containsKey(ErrorHandler.class)) {
+                                                        handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
+                                                            executor.submit(() -> {
+                                                                ((ErrorHandler) handler1).safelyHandle(ex);
+                                                            });
+                                                        });
                                                     }
                                                 }
                                             });
-                                        }
+                                        });
                                     }
                             }
                         }
@@ -267,32 +249,21 @@ public class Client {
         }
 
         if (handlers.containsKey(ConnectHandler.class)) {
-            for (final EventHandler handler : handlers.get(ConnectHandler.class)) {
-                executor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            ((ConnectHandler) handler).handle(new org.thethingsnetwork.data.common.Connection() {
-                                @Override
-                                public Object get() {
-                                    return channel;
-                                }
+            handlers.get(ConnectHandler.class).stream().forEach((handler) -> {
+                executor.submit(() -> {
+                    try {
+                        ((ConnectHandler) handler).handle(() -> channel);
+                    } catch (final Exception ex) {
+                        if (handlers.containsKey(ErrorHandler.class)) {
+                            handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
+                                executor.submit(() -> {
+                                    ((ErrorHandler) handler1).safelyHandle(ex);
+                                });
                             });
-                        } catch (final Exception ex) {
-                            if (handlers.containsKey(ErrorHandler.class)) {
-                                for (final EventHandler handler : handlers.get(ErrorHandler.class)) {
-                                    executor.submit(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            ((ErrorHandler) handler).safelyHandle(ex);
-                                        }
-                                    });
-                                }
-                            }
                         }
                     }
                 });
-            }
+            });
         }
         return this;
     }
@@ -343,7 +314,7 @@ public class Client {
      * Force destroy the client in case stop() does not work.
      *
      * @return the Client instance
-     * @throws MqttException in case something goes wrong
+     * @throws IOException in case something goes wrong
      */
     public Client endNow() throws IOException {
         if (connection == null) {
@@ -413,7 +384,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ConnectHandler.class)) {
-            handlers.put(ConnectHandler.class, new LinkedList<EventHandler>());
+            handlers.put(ConnectHandler.class, new LinkedList<>());
         }
         handlers.get(ConnectHandler.class)
                 .add(new ConnectHandler() {
@@ -436,7 +407,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ErrorHandler.class)) {
-            handlers.put(ErrorHandler.class, new LinkedList<EventHandler>());
+            handlers.put(ErrorHandler.class, new LinkedList<>());
         }
         handlers.get(ErrorHandler.class).add(new ErrorHandler() {
             @Override
@@ -460,7 +431,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(UplinkHandler.class)) {
-            handlers.put(UplinkHandler.class, new LinkedList<EventHandler>());
+            handlers.put(UplinkHandler.class, new LinkedList<>());
         }
         handlers.get(UplinkHandler.class).add(new UplinkHandler() {
             @Override
@@ -514,7 +485,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(ActivationHandler.class)) {
-            handlers.put(ActivationHandler.class, new LinkedList<EventHandler>());
+            handlers.put(ActivationHandler.class, new LinkedList<>());
         }
         handlers.get(ActivationHandler.class).add(new ActivationHandler() {
             @Override
@@ -553,7 +524,7 @@ public class Client {
             throw new RuntimeException("Already connected");
         }
         if (!handlers.containsKey(AbstractEventHandler.class)) {
-            handlers.put(AbstractEventHandler.class, new LinkedList<EventHandler>());
+            handlers.put(AbstractEventHandler.class, new LinkedList<>());
         }
         handlers.get(AbstractEventHandler.class).add(new AbstractEventHandler() {
             @Override
