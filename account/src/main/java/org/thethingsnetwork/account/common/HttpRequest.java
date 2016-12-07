@@ -50,7 +50,7 @@ public class HttpRequest {
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final MediaType mediatypeJson = MediaType.parse("application/json");
+    protected static final MediaType mediatypeJson = MediaType.parse("application/json");
 
     static {
         mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE)

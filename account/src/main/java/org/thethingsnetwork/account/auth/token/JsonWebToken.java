@@ -67,9 +67,13 @@ public class JsonWebToken implements OAuth2Token {
         return Observable.error(new UnsupportedOperationException("Not supported."));
     }
 
+    protected long getExpiration() {
+        return expiration;
+    }
+
     @Override
     public boolean isExpired() {
-        return expiration > (System.currentTimeMillis() + 30000);
+        return expiration < (System.currentTimeMillis() + 30000);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class JsonWebToken implements OAuth2Token {
         return accountServer;
     }
 
-    public Observable<JsonWebToken> restrict(List<String> _claims) {
+    public Observable<? extends JsonWebToken> restrict(List<String> _claims) {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
                     try {
@@ -107,6 +111,7 @@ public class JsonWebToken implements OAuth2Token {
                     }
                 })
                 .flatMap(HttpRequest::from)
+                .flatMap((HttpRequest t) -> t.inject(this))
                 .flatMap((HttpRequest t) -> HttpRequest
                         .buildRequestBody(new RestrictRequest(_claims))
                         .map((RequestBody rb) -> {
@@ -118,13 +123,13 @@ public class JsonWebToken implements OAuth2Token {
                 .map((RestrictResponse t) -> new JsonWebToken(t.accessToken, expiration, accountServer));
     }
 
-    public Observable<JsonWebToken> restrict(String... _claims) {
+    public Observable<? extends JsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 
     private class RestrictRequest {
 
-        private final List<String> scope;
+        public List<String> scope;
 
         public RestrictRequest(List<String> _scope) {
             scope = _scope;
@@ -133,7 +138,7 @@ public class JsonWebToken implements OAuth2Token {
 
     private static class RestrictResponse {
 
-        private String accessToken;
+        public String accessToken;
     }
 
 }

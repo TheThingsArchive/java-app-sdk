@@ -23,6 +23,8 @@
  */
 package org.thethingsnetwork.account.auth.token;
 
+import java.util.Arrays;
+import java.util.List;
 import org.thethingsnetwork.account.auth.grant.AuthorizationCode;
 import rx.Observable;
 
@@ -63,6 +65,32 @@ public class RenewableJsonWebToken extends JsonWebToken {
     @Override
     public Observable<? extends OAuth2Token> refresh() {
         return provider.refreshToken(this);
+    }
+
+    @Override
+    public Observable<? extends JsonWebToken> restrict(List<String> _claims) {
+        RenewableJsonWebToken that = this;
+        return super.restrict(_claims)
+                .map((JsonWebToken t) -> new RenewableJsonWebToken(t.getToken(), t.getExpiration(), "", provider) {
+
+                    @Override
+                    public Observable<? extends OAuth2Token> refresh() {
+                        return that.refresh()
+                                .map((OAuth2Token t1) -> (RenewableJsonWebToken) t1)
+                                .flatMap((RenewableJsonWebToken t1) -> t1
+                                        .restrict(_claims)
+                                        .map((JsonWebToken t2) -> {
+                                            RenewableJsonWebToken.this.refresh("", t2.getToken(), t1.getExpiration());
+                                            return RenewableJsonWebToken.this;
+                                        }));
+                    }
+
+                });
+    }
+
+    @Override
+    public Observable<? extends JsonWebToken> restrict(String... _claims) {
+        return restrict(Arrays.asList(_claims));
     }
 
     public RenewableJsonWebToken refresh(String _refreshToken, String _accessToken, long _expiration) {
