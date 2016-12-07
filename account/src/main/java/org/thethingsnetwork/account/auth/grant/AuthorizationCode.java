@@ -141,7 +141,7 @@ public class AuthorizationCode extends GrantType {
                     t.getBuilder().header("Authorization", getBasicAuthHeader());
                 })
                 .flatMap((HttpRequest t) -> t.doExecuteForType(TokenResponse.class))
-                .map((TokenResponse t) -> _token.refresh(t.refreshToken, t.accessToken, t.expiresIn));
+                .map((TokenResponse t) -> _token.refresh(t.refreshToken, t.accessToken, System.currentTimeMillis() + 1000 * t.expiresIn));
     }
 
     private class TokenRequest {

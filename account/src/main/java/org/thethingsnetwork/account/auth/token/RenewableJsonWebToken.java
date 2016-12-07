@@ -71,7 +71,7 @@ public class RenewableJsonWebToken extends JsonWebToken {
     public Observable<? extends JsonWebToken> restrict(List<String> _claims) {
         RenewableJsonWebToken that = this;
         return super.restrict(_claims)
-                .map((JsonWebToken t) -> new RenewableJsonWebToken(t.getToken(), t.getExpiration(), "", provider) {
+                .map((JsonWebToken t) -> new RenewableJsonWebToken(t.getToken().substring(7), t.getExpiration(), "", provider) {
 
                     @Override
                     public Observable<? extends OAuth2Token> refresh() {
@@ -80,8 +80,8 @@ public class RenewableJsonWebToken extends JsonWebToken {
                                 .flatMap((RenewableJsonWebToken t1) -> t1
                                         .restrict(_claims)
                                         .map((JsonWebToken t2) -> {
-                                            RenewableJsonWebToken.this.refresh("", t2.getToken(), t1.getExpiration());
-                                            return RenewableJsonWebToken.this;
+                                            refresh("", t2.getToken().substring(7), t1.getExpiration());
+                                            return this;
                                         }));
                     }
 
@@ -96,7 +96,7 @@ public class RenewableJsonWebToken extends JsonWebToken {
     public RenewableJsonWebToken refresh(String _refreshToken, String _accessToken, long _expiration) {
         setRefreshToken(_refreshToken);
         setToken(_accessToken);
-        setExpiration(System.currentTimeMillis() + 1000 * _expiration);
+        setExpiration(_expiration);
         return this;
     }
 }
