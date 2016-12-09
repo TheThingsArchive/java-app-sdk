@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.thethingsnetwork.account.AbstractApplication;
+import org.thethingsnetwork.account.AccessKey;
 import org.thethingsnetwork.account.Collaborator;
 import org.thethingsnetwork.account.auth.token.OAuth2Token;
 import org.thethingsnetwork.account.common.HttpRequest;
@@ -213,7 +214,11 @@ public class AsyncApplication implements AbstractApplication {
         /**
          * GET /applications/{app_id}/collaborators/{username}
          */
-        return getCollaborators().filter((Collaborator t) -> t.getUsername().equals(_username));
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + getId() + "/collaborators/" + _username)
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .doOnNext((HttpRequest t) -> t.getBuilder().get())
+                .flatMap((HttpRequest t) -> t.doExecuteForType(Collaborator.class));
     }
 
     public Observable<Collaborator> addCollaborator(Collaborator _collaborator) {
@@ -244,6 +249,59 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((HttpRequest t) -> t.getBuilder().delete())
                 .flatMap((HttpRequest t) -> t.doExecute())
                 .map((Response c) -> _collaborator);
+    }
+
+    public Observable<AccessKey> getAccessKeys() {
+        /**
+         * GET /applications/{app_id}/access-keys
+         */
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys")
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .doOnNext((HttpRequest t) -> t.getBuilder().get())
+                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey[].class))
+                .flatMap((AccessKey[] cs) -> Observable.from(cs));
+    }
+
+    public Observable<AccessKey> findOneAccessKey(String _keyname) {
+        /**
+         * GET /applications/{app_id}/access-keys/{keyname}
+         */
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys/" + _keyname)
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .doOnNext((HttpRequest t) -> t.getBuilder().get())
+                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey.class));
+    }
+
+    public Observable<AccessKey> addAccessKey(AccessKey _key) {
+        /**
+         * POST /applications/{app_id}/access-keys/{username}
+         */
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys")
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .flatMap((HttpRequest t) -> HttpRequest
+                        .buildRequestBody(_key)
+                        .map((RequestBody rb) -> {
+                            t.getBuilder().post(rb);
+                            return t;
+                        })
+                )
+                .flatMap((HttpRequest t) -> t.doExecute())
+                .map((Response c) -> _key);
+    }
+
+    public Observable<AccessKey> removeAccessKey(AccessKey _key) {
+        /**
+         * DELETE /applications/{app_id}/access-keys/{keyname}
+         */
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys/" + _key.getName())
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .doOnNext((HttpRequest t) -> t.getBuilder().delete())
+                .flatMap((HttpRequest t) -> t.doExecute())
+                .map((Response c) -> _key);
     }
 
     public Observable<AsyncApplication> refresh() {

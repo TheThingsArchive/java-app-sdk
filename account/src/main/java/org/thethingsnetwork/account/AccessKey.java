@@ -24,8 +24,8 @@
 package org.thethingsnetwork.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Collections;
 import java.util.List;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
 
 /**
  *
@@ -38,7 +38,15 @@ public class AccessKey {
     private String key;
     private List<String> rights;
 
-    public void updateCredentials(OAuth2Token _creds) {
-        
+    public String getName() {
+        return name;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public List<String> getRights() {
+        return Collections.unmodifiableList(rights);
     }
 }

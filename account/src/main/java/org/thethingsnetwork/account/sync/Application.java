@@ -25,6 +25,7 @@ package org.thethingsnetwork.account.sync;
 
 import java.util.List;
 import org.thethingsnetwork.account.AbstractApplication;
+import org.thethingsnetwork.account.AccessKey;
 import org.thethingsnetwork.account.Collaborator;
 import org.thethingsnetwork.account.async.AsyncApplication;
 import org.thethingsnetwork.account.auth.token.OAuth2Token;
@@ -127,6 +128,31 @@ public class Application implements AbstractApplication {
 
     public Collaborator removeCollaborator(Collaborator _collaborator) {
         return wrapped.removeCollaborator(_collaborator)
+                .toBlocking()
+                .single();
+    }
+
+    public List<AccessKey> getAccessKeys() {
+        return wrapped.getAccessKeys()
+                .toList()
+                .toBlocking()
+                .single();
+    }
+
+    public AccessKey findOneAccessKey(String _keyname) {
+        return wrapped.findOneAccessKey(_keyname)
+                .toBlocking()
+                .singleOrDefault(null);
+    }
+
+    public AccessKey addAccessKey(AccessKey _key) {
+        return wrapped.addAccessKey(_key)
+                .toBlocking()
+                .single();
+    }
+
+    public AccessKey removeAccessKey(AccessKey _key) {
+        return wrapped.removeAccessKey(_key)
                 .toBlocking()
                 .single();
     }
