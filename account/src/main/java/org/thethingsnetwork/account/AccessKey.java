@@ -38,6 +38,15 @@ public class AccessKey {
     private String key;
     private List<String> rights;
 
+    public AccessKey() {
+
+    }
+
+    public AccessKey(String _name, List<String> _rights) {
+        name = _name;
+        rights = _rights;
+    }
+
     public String getName() {
         return name;
     }
