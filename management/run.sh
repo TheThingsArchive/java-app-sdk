@@ -1,8 +1,8 @@
 #!/bin/bash
 root=$(pwd)
 workdir="$root/src/main/proto"
-javaPackageName='io.wethings.gateway.ttn.proto'
-branch='v2-preview'
+javaPackageName='org.thethingsnetwork.management.proto'
+branch='master'
 
 echo "Cleaning workspace...";
 rm -rf "$workdir/ttn"

@@ -25,11 +25,11 @@ package org.thethingsnetwork.management.async;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.wethings.gateway.ttn.proto.DiscoveryGrpc;
-import io.wethings.gateway.ttn.proto.DiscoveryOuterClass;
-import io.wethings.gateway.ttn.proto.DiscoveryOuterClass.GetRequest;
 import java.io.ByteArrayInputStream;
 import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.management.proto.DiscoveryGrpc;
+import org.thethingsnetwork.management.proto.DiscoveryOuterClass;
+import org.thethingsnetwork.management.proto.DiscoveryOuterClass.GetRequest;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;

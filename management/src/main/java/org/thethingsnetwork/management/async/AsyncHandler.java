@@ -33,7 +33,6 @@ import io.grpc.MethodDescriptor;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
-import io.wethings.gateway.ttn.proto.ApplicationManagerGrpc;
 import java.io.InputStream;
 import java.net.URI;
 import org.thethingsnetwork.account.AbstractApplication;
@@ -41,6 +40,7 @@ import org.thethingsnetwork.account.auth.grant.ApplicationPassword;
 import org.thethingsnetwork.account.auth.token.OAuth2Token;
 import org.thethingsnetwork.management.HandlerApplication;
 import org.thethingsnetwork.management.HandlerDevice;
+import org.thethingsnetwork.management.proto.ApplicationManagerGrpc;
 import rx.Observable;
 import rx.Subscriber;
 
