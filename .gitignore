@@ -19,3 +19,6 @@
 /data/amqp/target/
 /data/mqtt/target/
 /data/target/
+/samples/mqtt/target/
+/.license
+/management/src/main/proto/

@@ -46,6 +46,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
+import org.thethingsnetwork.data.common.AbstractClient;
 import org.thethingsnetwork.data.common.Connection;
 import org.thethingsnetwork.data.common.Subscribable;
 import org.thethingsnetwork.data.common.TriConsumer;
@@ -61,7 +62,7 @@ import org.thethingsnetwork.data.common.events.UplinkHandler;
  *
  * @author Romain Cambier
  */
-public class Client {
+public class Client implements AbstractClient {
 
     /**
      * Connection settings
@@ -119,24 +120,23 @@ public class Client {
 
         URI tempBroker = new URI(_source.contains(".") ? _source : (_source + ".thethings.network"));
 
-        if (null != tempBroker.getScheme()) {
-            switch (tempBroker.getScheme()) {
-                case "tcp":
-                    if (tempBroker.getPort() == -1) {
-                        return tempBroker.toString() + ":1883";
-                    }
-                    break;
-                case "ssl":
-                    if (tempBroker.getPort() == -1) {
-                        return tempBroker.toString() + ":8883";
-                    }
-                    break;
-                default:
-                    return "tcp://" + tempBroker.getPath() + ":1883";
+        if ("tcp".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":1883";
+            } else {
+                return tempBroker.toString();
             }
+        } else if ("ssl".equals(tempBroker.getScheme())) {
+            if (tempBroker.getPort() == -1) {
+                return tempBroker.toString() + ":8883";
+            } else {
+                return tempBroker.toString();
+            }
+        } else if (tempBroker.getPort() != -1) {
+            return "tcp://" + tempBroker.toString();
+        } else {
+            return "tcp://" + tempBroker.toString() + ":1883";
         }
-
-        return tempBroker.toString();
     }
 
     /**
@@ -153,12 +153,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Start the client
-     *
-     * @return the Client instance
-     * @throws MqttException in case something goes wrong
-     */
+    @Override
     public Client start() throws MqttException, Exception {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -325,13 +320,7 @@ public class Client {
         return sj.toString();
     }
 
-    /**
-     * Stop the client after max. 5000 ms
-     *
-     * @return the Client instance
-     * @throws MqttException in case something goes wrong
-     * @throws java.lang.InterruptedException
-     */
+    @Override
     public Client end() throws MqttException, InterruptedException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -339,14 +328,7 @@ public class Client {
         return end(5000);
     }
 
-    /**
-     * Stop the client after max. the provided timeout
-     *
-     * @param _timeout The disconnect timeout
-     * @return the Client instance
-     * @throws MqttException in case something goes wrong
-     * @throws java.lang.InterruptedException
-     */
+    @Override
     public Client end(long _timeout) throws MqttException, InterruptedException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -359,12 +341,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Force destroy the client in case stop() does not work.
-     *
-     * @return the Client instance
-     * @throws MqttException in case something goes wrong
-     */
+    @Override
     public Client endNow() throws MqttException {
         if (mqttClient == null) {
             throw new RuntimeException("Not connected");
@@ -374,14 +351,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Send a downlink message using raw data
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws MqttException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, byte[] _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
@@ -389,14 +359,7 @@ public class Client {
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
 
-    /**
-     * Send a downlink message using pre-registered encoder
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws MqttException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, JSONObject _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         data.put("payload_fields", _payload);
@@ -404,14 +367,7 @@ public class Client {
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
 
-    /**
-     * Send a downlink message using pre-registered encoder
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws MqttException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, ByteBuffer _payload, int _port) throws MqttException {
         JSONObject data = new JSONObject();
         _payload.rewind();
@@ -422,12 +378,7 @@ public class Client {
         mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
     }
 
-    /**
-     * Register a connection event handler
-     *
-     * @param _handler The connection event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onConnected(final Consumer<Connection> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -444,12 +395,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an error event handler
-     *
-     * @param _handler The error event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onError(final Consumer<Throwable> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -466,14 +412,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @param _devId The devId you want to filter on
-     * @param _field the field you want to get
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -500,34 +439,17 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final String _devId, final BiConsumer<String, Object> _handler) {
         return onMessage(_devId, null, _handler);
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final BiConsumer<String, Object> _handler) {
         return onMessage(null, null, _handler);
     }
 
-    /**
-     * Register an activation event handler
-     *
-     * @param _handler The activation event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
+    @Override
     public Client onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
@@ -549,25 +471,13 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an activation event handler
-     *
-     * @param _handler The activation event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onActivation(final BiConsumer<String, JSONObject> _handler) {
         return onActivation(null, _handler);
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @param _devId The devId you want to filter on
-     * @param _event The event you want to filter on
-     * @return the Client instance
-     */
-    public Client onOtherEvent(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
+    @Override
+    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -593,25 +503,14 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
-    public Client onOtherEvent(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
-        return onOtherEvent(_devId, null, _handler);
+    @Override
+    public Client onDevice(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
+        return onDevice(_devId, null, _handler);
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onDevice(final TriConsumer<String, String, JSONObject> _handler) {
-        return onOtherEvent(null, null, _handler);
+        return onDevice(null, null, _handler);
     }
 
 }

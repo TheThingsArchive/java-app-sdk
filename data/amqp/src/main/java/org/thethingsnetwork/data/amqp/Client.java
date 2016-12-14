@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.json.JSONObject;
+import org.thethingsnetwork.data.common.AbstractClient;
 import org.thethingsnetwork.data.common.Subscribable;
 import org.thethingsnetwork.data.common.TriConsumer;
 import org.thethingsnetwork.data.common.events.AbstractEventHandler;
@@ -57,7 +58,7 @@ import org.thethingsnetwork.data.common.events.UplinkHandler;
  *
  * @author Romain Cambier
  */
-public class Client {
+public class Client implements AbstractClient {
 
     /**
      * Connection settings
@@ -120,12 +121,7 @@ public class Client {
         return factory;
     }
 
-    /**
-     * Start the client
-     *
-     * @return the Client instance
-     * @throws java.lang.Exception in case something went wrong
-     */
+    @Override
     public Client start() throws Exception {
         if (connection != null) {
             throw new RuntimeException("Already connected");
@@ -276,13 +272,7 @@ public class Client {
         return sj.toString();
     }
 
-    /**
-     * Stop the client after max. 5000 ms
-     *
-     * @return the Client instance
-     * @throws java.lang.InterruptedException
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public Client end() throws InterruptedException, IOException {
         if (connection == null) {
             throw new RuntimeException("Not connected");
@@ -290,14 +280,7 @@ public class Client {
         return end(5000);
     }
 
-    /**
-     * Stop the client after max. the provided timeout
-     *
-     * @param _timeout The disconnect timeout
-     * @return the Client instance
-     * @throws java.lang.InterruptedException
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public Client end(long _timeout) throws InterruptedException, IOException {
         if (connection == null) {
             throw new RuntimeException("Not connected");
@@ -310,12 +293,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Force destroy the client in case stop() does not work.
-     *
-     * @return the Client instance
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public Client endNow() throws IOException {
         if (connection == null) {
             throw new RuntimeException("Not connected");
@@ -325,14 +303,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Send a downlink message using raw data
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, byte[] _payload, int _port) throws IOException {
         JSONObject data = new JSONObject();
         data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
@@ -340,14 +311,7 @@ public class Client {
         channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
     }
 
-    /**
-     * Send a downlink message using pre-registered encoder
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, JSONObject _payload, int _port) throws IOException {
         JSONObject data = new JSONObject();
         data.put("payload_fields", _payload);
@@ -355,14 +319,7 @@ public class Client {
         channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
     }
 
-    /**
-     * Send a downlink message using pre-registered encoder
-     *
-     * @param _devId The devId (devEUI for staging) to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws IOException in case something goes wrong
-     */
+    @Override
     public void send(String _devId, ByteBuffer _payload, int _port) throws IOException {
         JSONObject data = new JSONObject();
         _payload.rewind();
@@ -373,12 +330,7 @@ public class Client {
         channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
     }
 
-    /**
-     * Register a connection event handler
-     *
-     * @param _handler The connection event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onConnected(final Consumer<org.thethingsnetwork.data.common.Connection> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
@@ -396,12 +348,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an error event handler
-     *
-     * @param _handler The error event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onError(final Consumer<Throwable> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
@@ -418,14 +365,7 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @param _devId The devId you want to filter on
-     * @param _field the field you want to get
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
@@ -452,34 +392,17 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final String _devId, final BiConsumer<String, Object> _handler) {
         return onMessage(_devId, null, _handler);
     }
 
-    /**
-     * Register an uplink event handler
-     *
-     * @param _handler The uplink event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onMessage(final BiConsumer<String, Object> _handler) {
         return onMessage(null, null, _handler);
     }
 
-    /**
-     * Register an activation event handler
-     *
-     * @param _handler The activation event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
+    @Override
     public Client onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
@@ -501,25 +424,13 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register an activation event handler
-     *
-     * @param _handler The activation event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onActivation(final BiConsumer<String, JSONObject> _handler) {
         return onActivation(null, _handler);
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @param _devId The devId you want to filter on
-     * @param _event The event you want to filter on
-     * @return the Client instance
-     */
-    public Client onOtherEvent(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
+    @Override
+    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -545,24 +456,13 @@ public class Client {
         return this;
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @param _devId The devId you want to filter on
-     * @return the Client instance
-     */
-    public Client onOtherEvent(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
-        return onOtherEvent(_devId, null, _handler);
+    @Override
+    public Client onDevice(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
+        return onDevice(_devId, null, _handler);
     }
 
-    /**
-     * Register a default event handler
-     *
-     * @param _handler The default event handler
-     * @return the Client instance
-     */
+    @Override
     public Client onDevice(final TriConsumer<String, String, JSONObject> _handler) {
-        return onOtherEvent(null, null, _handler);
+        return onDevice(null, null, _handler);
     }
 }

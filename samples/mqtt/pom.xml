@@ -3,20 +3,25 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.thethingsnetwork</groupId>
-        <artifactId>app-sdk</artifactId>
+        <artifactId>samples</artifactId>
         <version>2.0.0</version>
     </parent>
-    <artifactId>samples</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>samples-mqtt</artifactId>
+    <packaging>jar</packaging>
     
-    <name>The Things Network SDK Samples</name>
-    <description>The Things Network SDK Samples</description>
-    <modules>
-        <module>mqtt</module>
-    </modules>
+    <name>The Things Network MQTT Sample</name>
+    <description>The Things Network MQTT Sample</description>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>data-mqtt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    
 </project>
