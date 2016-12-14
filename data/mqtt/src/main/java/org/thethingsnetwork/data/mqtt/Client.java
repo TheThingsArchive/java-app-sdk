@@ -369,13 +369,10 @@ public class Client implements AbstractClient {
 
     @Override
     public void send(String _devId, ByteBuffer _payload, int _port) throws MqttException {
-        JSONObject data = new JSONObject();
         _payload.rewind();
         byte[] payload = new byte[_payload.capacity() - _payload.remaining()];
         _payload.get(payload);
-        data.put("payload_fields", Base64.getEncoder().encodeToString(payload));
-        data.put("port", _port != 0 ? _port : 1);
-        mqttClient.publish(appId + "/devices/" + _devId + "/down", data.toString().getBytes(), 0, false);
+        send(_devId, payload, _port);
     }
 
     @Override

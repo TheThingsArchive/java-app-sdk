@@ -102,7 +102,7 @@ public interface AbstractClient {
      * Register a connection event handler
      *
      * @param _handler The connection event handler
-     * @return the Client instance
+     * @return the Connection instance
      * @throws Exception in case something goes wrong
      */
     public AbstractClient onConnected(final Consumer<Connection> _handler) throws Exception;

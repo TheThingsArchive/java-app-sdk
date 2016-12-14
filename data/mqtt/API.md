@@ -24,14 +24,14 @@ Client client = new Client(region, appId, accessKey [, connOpts]);
 Emitted on successful connection.
 
 ```java
-client.onConnected(new Consumer<MqttClient>() {
-    public void accept(MqttClient client) {
+client.onConnected(new Consumer<Connection>() {
+    public void accept(Connection client) {
         System.out.println("connected !");
     }
 });
 ```
 
-* `cb.client [MqttClient]`: MQTT connection wrapper. See [MQTT](http://www.eclipse.org/paho/files/javadoc/org/eclipse/paho/client/mqttv3/MqttClient.html).
+* `cb.client [Connection]`: MQTT connection wrapper. See [MQTT](http://www.eclipse.org/paho/files/javadoc/org/eclipse/paho/client/mqttv3/MqttClient.html).
 
 ## Event: error
 
