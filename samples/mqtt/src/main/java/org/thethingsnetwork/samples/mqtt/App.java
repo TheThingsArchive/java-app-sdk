@@ -56,6 +56,8 @@ public class App {
             }
         });
 
+        client.onMessage((String devId, Object data) -> System.out.println("Message: " + devId + " " + data));
+
         client.onActivation((String _devId, JSONObject _data) -> System.out.println("Activation: " + _devId + ", data: " + _data));
 
         client.onError((Throwable _error) -> System.err.println("error: " + _error.getMessage()));
@@ -63,6 +65,8 @@ public class App {
         client.onConnected((Connection _client) -> System.out.println("connected !"));
 
         client.start();
+
+        client.onDevice(null, "down/scheduled", (String devId, String event, JSONObject data) -> System.out.println("Received event " + event + "for device " + devId));
     }
 
 }
