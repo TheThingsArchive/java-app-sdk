@@ -1,4 +1,4 @@
-# The Things Network Java MQTT Client [![Build Status](https://travis-ci.org/TheThingsNetwork/java-app-sdk.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/java-app-sdk) [![MAVEN](https://img.shields.io/maven-central/v/org.thethingsnetwork/java-app-lib.svg)](http://mvnrepository.com/artifact/org.thethingsnetwork/java-app-lib)
+# The Things Network Java MQTT Client [![Build Status](https://travis-ci.org/TheThingsNetwork/java-app-sdk.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/java-app-sdk) [![MAVEN](https://img.shields.io/maven-central/v/org.thethingsnetwork/data-mqtt.svg)](http://mvnrepository.com/artifact/org.thethingsnetwork/data-mqtt)
 
 This is the Java MQTT client for [The Things Network](https://www.thethingsnetwork.org) to receive activations and messages from IoT devices via The Things Network and send messages as well.
 
