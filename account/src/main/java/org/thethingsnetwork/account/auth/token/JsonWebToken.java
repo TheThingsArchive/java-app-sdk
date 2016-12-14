@@ -127,6 +127,11 @@ public class JsonWebToken implements OAuth2Token {
         return restrict(Arrays.asList(_claims));
     }
 
+    @Override
+    public String getRawToken() {
+        return token;
+    }
+
     private class RestrictRequest {
 
         public List<String> scope;

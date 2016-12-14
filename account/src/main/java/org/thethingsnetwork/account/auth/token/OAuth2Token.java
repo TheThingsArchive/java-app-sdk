@@ -40,6 +40,8 @@ public interface OAuth2Token {
 
     public String getToken();
     
+    public String getRawToken();
+    
     public URI getAccountServer();
 
 }
