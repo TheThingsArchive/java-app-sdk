@@ -45,7 +45,7 @@ public class AsyncApplication implements AbstractApplication {
     @JsonIgnore
     protected OAuth2Token creds;
 
-    public AsyncApplication() {
+    private AsyncApplication() {
     }
 
     public AsyncApplication(String _id, String _name) {

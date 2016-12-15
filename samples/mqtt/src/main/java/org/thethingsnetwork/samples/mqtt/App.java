@@ -65,8 +65,6 @@ public class App {
         client.onConnected((Connection _client) -> System.out.println("connected !"));
 
         client.start();
-
-        client.onDevice(null, "down/scheduled", (String devId, String event, JSONObject data) -> System.out.println("Received event " + event + "for device " + devId));
     }
 
 }
