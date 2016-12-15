@@ -1,0 +1,20 @@
+<servers>
+    <server>
+        <id>ossrh</id>
+        <username>${env.SONATYPE_USERNAME}</username>
+        <password>${env.SONATYPE_PASSWORD}</password>
+    </server>
+    <profiles>
+        <profile>
+            <id>ossrh</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.executable>gpg2</gpg.executable>
+                <gpg.keyname>E4536054</gpg.keyname>
+                <gpg.passphrase>${env.GPG_PASSWORD}</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
+</servers>
