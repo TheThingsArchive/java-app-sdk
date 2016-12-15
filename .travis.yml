@@ -1,4 +1,4 @@
 language: java
 jdk:
   - oraclejdk8
-script: mvn clean validate compile test package verify install deploy --settings settings.xml
+script: run.sh
