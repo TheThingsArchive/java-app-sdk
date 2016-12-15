@@ -38,9 +38,9 @@ A [sample app](samples/mqtt/src/main/java/org/thethingsnetwork/samples/mqtt/App.
     export appId="my-app-id"
     export accessKey="my-access-key"
     ```
-6.  Build and run the Test class:
+6.  Build and run the MQTT sample:
 
     ```bash
     cd samples/mqtt
-    mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.java.app.sample.App"
+    mvn clean compile exec:java -Dexec.mainClass="org.thethingsnetwork.samples.mqtt.App"
     ```
