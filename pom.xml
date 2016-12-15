@@ -2,18 +2,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.thethingsnetwork</groupId>
-    <artifactId>java-app-lib</artifactId>
-    <version>1.0.0</version>
-    <packaging>bundle</packaging>
+    <artifactId>app-sdk</artifactId>
+    <version>2.0.0</version>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>samples</module>
+        <module>account</module>
+        <module>data</module>
+        <module>management</module>
+    </modules>
+    
+    <name>The Things Network Java SDK</name>
+    <description>The Things Network Java SDK</description>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <name>The Things Network Java Client</name>
-    <description>The Things Network Java Client</description>
-    <url>https://github.com/TheThingsNetwork/java-app-lib</url>
     
+    <url>https://github.com/TheThingsNetwork/java-app-lib</url>
     
     <licenses>
         <license>
@@ -22,13 +31,11 @@
         </license>
     </licenses>
     
-    
     <scm>
         <url>https://github.com/TheThingsNetwork/java-app-lib</url>
         <connection>scm:git:git://github.com/TheThingsNetwork/java-app-lib.git</connection>
         <developerConnection>scm:git:git@github.com:TheThingsNetwork/java-app-lib.git</developerConnection>
     </scm>
-    
     
     <developers>
         <developer>
@@ -54,28 +61,6 @@
         <system>Github</system>
         <url>https://github.com/TheThingsNetwork/java-app-lib/issues</url>
     </issueManagement>
-    
-    <dependencies>
-        <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20160810</version>
-        </dependency>
-    </dependencies>
-    
-    
-    <repositories>
-        <repository>
-            <id>Eclipse Paho Repo</id>
-            <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
-        </repository>
-    </repositories>
-    
     
     <build>
         <plugins>
@@ -118,12 +103,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.2.0</version>
-                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
