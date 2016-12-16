@@ -14,4 +14,5 @@ This is the Java SDK for [The Things Network](https://www.thethingsnetwork.org) 
 
 ## Documentation
 
-A Quick Start and full API Reference can be found in [The Things Network Documentation](https://www.thethingsnetwork.org/docs/applications/java/).
+- [The Things Network Documentation](https://www.thethingsnetwork.org/docs/applications/java/)
+- [Javadoc](https://thethingsnetwork.github.io/java-app-sdk/)
