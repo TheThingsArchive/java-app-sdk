@@ -86,15 +86,12 @@ public class AsyncDiscovery {
     private Observable<AsyncHandler> from(OAuth2Token _creds, DiscoveryOuterClass.Announcement _announcement) {
         return Observable.from(_announcement.getNetAddress().split(","))
                 .flatMap((String tt) -> Observable
-                        .create(new Observable.OnSubscribe<Server>() {
-                            @Override
-                            public void call(Subscriber<? super Server> t) {
-                                try {
-                                    t.onNext(new Server(tt));
-                                    t.onCompleted();
-                                } catch (Exception ex) {
-                                    t.onError(ex);
-                                }
+                        .create((Subscriber<? super Server> t) -> {
+                            try {
+                                t.onNext(new Server(tt));
+                                t.onCompleted();
+                            } catch (Exception ex) {
+                                t.onError(ex);
                             }
                         })
                 )

@@ -39,7 +39,7 @@ echo "Patching files...";
 folders=`find "$workdir/ttn/api" -type f -name "*.proto"`
 for i in $folders
 do
-    sed -n -i "H;\${x;s/^\n//;s/import .*\n/option java_package = \"$javaPackageName\";\n\n&/;p;}" $i
+    sed -n -i "H;\${x;s/^\n//;s/option go_package .*\n/option java_package = \"$javaPackageName\";\n\n&/;p;}" $i
 done
 echo "done."
 
