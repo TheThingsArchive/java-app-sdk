@@ -23,6 +23,7 @@
  */
 package org.thethingsnetwork.management.async;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -34,15 +35,16 @@ import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
 import java.io.InputStream;
-import java.net.URI;
 import org.thethingsnetwork.account.AbstractApplication;
 import org.thethingsnetwork.account.auth.grant.ApplicationPassword;
 import org.thethingsnetwork.account.auth.token.OAuth2Token;
 import org.thethingsnetwork.management.HandlerApplication;
 import org.thethingsnetwork.management.HandlerDevice;
 import org.thethingsnetwork.management.proto.ApplicationManagerGrpc;
+import org.thethingsnetwork.management.proto.HandlerOuterClass;
 import rx.Observable;
 import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 /**
  *
@@ -99,19 +101,37 @@ public class AsyncHandler {
     }
 
     public Observable<HandlerApplication> registerApplication(AbstractApplication _application) {
-        return null;
+        return Observable
+                .from(stub.registerApplication(
+                        HandlerOuterClass.ApplicationIdentifier
+                        .newBuilder()
+                        .setAppId(_application.getId())
+                        .build()
+                ), Schedulers.io())
+                .flatMap((ignore) -> getApplication(_application.getId()));
     }
 
     public Observable<HandlerApplication> getApplication(String _applicationId) {
-        return null;
+        return Observable.from(stub.getApplication(HandlerOuterClass.ApplicationIdentifier.newBuilder().setAppId(_applicationId).build()), Schedulers.io())
+                .flatMap(HandlerApplication::from);
     }
 
     public Observable<HandlerApplication> setApplication(HandlerApplication _application) {
-        return null;
+        return _application
+                .toProto()
+                .flatMap((HandlerOuterClass.Application t) -> Observable.from(stub.setApplication(t), Schedulers.io()))
+                .map((ignore) -> _application);
     }
 
     public Observable<HandlerApplication> deleteApplication(HandlerApplication _application) {
-        return null;
+        return Observable
+                .from(stub.deleteApplication(
+                        HandlerOuterClass.ApplicationIdentifier
+                        .newBuilder()
+                        .setAppId(_application.getAppId())
+                        .build()
+                ), Schedulers.io())
+                .map((ignore) -> _application);
     }
 
     public Observable<HandlerDevice> getDevices(HandlerApplication _application) {
@@ -132,13 +152,19 @@ public class AsyncHandler {
 
     public static void main(String[] args) throws Exception {
 
-        ApplicationPassword ac = new ApplicationPassword("shareif", "ttn-account-preview.r_1_KeoiZyRT7CRZp_MutO7HePdvJzuGnh5CtvG-eZE", "cambierr-dev", "1dd9593a1007e492357a61ca9e802fcaf2d6cc2ac03a77d5abe8edc397e615e9", new URI("https://preview.account.thethingsnetwork.org"));
+        ApplicationPassword ac = new ApplicationPassword("shareif", "ttn-account-v2.5qvHalIXQ27m_o-3Ht6lSQZVXTsZFcuyPp-MrNqh-OE", "cambierr-dev", "1dd9593a1007e492357a61ca9e802fcaf2d6cc2ac03a77d5abe8edc397e615e9");
 
         OAuth2Token token = ac.getToken().toBlocking().single();
+
+        System.out.println(token.getRawToken());
 
         AsyncDiscovery ad = AsyncDiscovery.getDefault().toBlocking().single();
 
         AsyncHandler ah = ad.getHandler(token, "ttn-handler-eu").toBlocking().single();
+
+        HandlerApplication ap = ah.getApplication("shareif").toBlocking().single();
+
+        System.out.println(new ObjectMapper().writeValueAsString(ap));
 
     }
 

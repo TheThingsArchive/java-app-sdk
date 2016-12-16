@@ -23,10 +23,88 @@
  */
 package org.thethingsnetwork.management;
 
+import org.thethingsnetwork.management.proto.HandlerOuterClass;
+import rx.Observable;
+import rx.Subscriber;
+
 /**
  *
  * @author Romain Cambier
  */
 public class HandlerApplication {
-    
+
+    private String appId;
+    private String decoder;
+    private String converter;
+    private String validator;
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public String getDecoder() {
+        return decoder;
+    }
+
+    public String getConverter() {
+        return converter;
+    }
+
+    public String getValidator() {
+        return validator;
+    }
+
+    public String getEncoder() {
+        return encoder;
+    }
+    private String encoder;
+
+    private HandlerApplication(String _appId, String _decoder, String _converter, String _validator, String _encoder) {
+        appId = _appId;
+        decoder = _decoder;
+        converter = _converter;
+        validator = _validator;
+        encoder = _encoder;
+    }
+
+    public static Observable<HandlerApplication> from(HandlerOuterClass.Application _proto) {
+
+        return Observable
+                .create((Subscriber<? super HandlerApplication> t) -> {
+                    try {
+                        t.onNext(new HandlerApplication(
+                                _proto.getAppId(),
+                                _proto.getDecoder(),
+                                _proto.getConverter(),
+                                _proto.getValidator(),
+                                _proto.getEncoder()
+                        ));
+                        t.onCompleted();
+                    } catch (Exception ex) {
+                        t.onError(ex);
+                    }
+                });
+
+    }
+
+    public Observable<HandlerOuterClass.Application> toProto() {
+
+        return Observable
+                .create((Subscriber<? super HandlerOuterClass.Application> t) -> {
+                    try {
+                        t.onNext(HandlerOuterClass.Application.newBuilder()
+                                .setAppId(appId)
+                                .setDecoder(decoder)
+                                .setConverter(converter)
+                                .setValidator(validator)
+                                .setEncoder(encoder)
+                                .build()
+                        );
+                        t.onCompleted();
+                    } catch (Exception ex) {
+                        t.onError(ex);
+                    }
+                });
+
+    }
 }
