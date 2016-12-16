@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>samples</module>
         <module>account</module>
         <module>data</module>
         <module>management</module>
