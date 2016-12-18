@@ -42,7 +42,7 @@ public abstract class ActivationHandler implements EventHandler {
 
     @Override
     public void subscribe(Subscribable _client) throws Exception {
-        _client.subscibe(new String[]{
+        _client.subscribe(new String[]{
             _client.getWordWildcard(),
             _client.getWordWildcard(),
             (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
