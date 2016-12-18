@@ -29,7 +29,7 @@ package org.thethingsnetwork.data.common;
  */
 public interface Subscribable {
 
-    public void subscibe(String[] _key) throws Exception;
+    public void subscribe(String[] _key) throws Exception;
 
     public String getWordWildcard();
 
