@@ -21,40 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.data.messages;
-
-import org.thethingsnetwork.data.common.Metadata;
+package org.thethingsnetwork.data.common.messages;
 
 /**
  *
  * @author Romain Cambier
  */
-public class ActivationMessage {
-
-    private String appEui;
-    private String devEui;
-    private String devAddr;
-    private Metadata metadata;
-    
-    private ActivationMessage(){
-        
-    }
-
-    public String getAppEui() {
-        return appEui;
-    }
-
-    public String getDevEui() {
-        return devEui;
-    }
-
-    public String getDevAddr() {
-        return devAddr;
-    }
-
-    public Metadata getMetadata() {
-        return metadata;
-    }
-    
+public interface DataMessage {
     
 }

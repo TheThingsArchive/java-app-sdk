@@ -24,7 +24,7 @@
 package org.thethingsnetwork.data.common.events;
 
 import org.thethingsnetwork.data.common.Subscribable;
-import org.thethingsnetwork.data.messages.DataMessage;
+import org.thethingsnetwork.data.common.messages.DataMessage;
 
 /**
  *

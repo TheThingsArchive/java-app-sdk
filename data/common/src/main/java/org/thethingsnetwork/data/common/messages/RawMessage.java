@@ -15,7 +15,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Shareif.com SPRL.
  */
-package org.thethingsnetwork.data.messages;
+package org.thethingsnetwork.data.common.messages;
 
 import java.io.IOException;
 import org.thethingsnetwork.data.common.AbstractClient;

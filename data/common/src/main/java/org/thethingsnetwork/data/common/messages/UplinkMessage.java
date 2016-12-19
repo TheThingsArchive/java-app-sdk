@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.data.messages;
+package org.thethingsnetwork.data.common.messages;
 
 import java.util.Base64;
 import java.util.Collections;

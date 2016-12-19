@@ -15,7 +15,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from Shareif.com SPRL.
  */
-package org.thethingsnetwork.data.messages;
+package org.thethingsnetwork.data.common.messages;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

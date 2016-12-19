@@ -23,7 +23,7 @@
  */
 package org.thethingsnetwork.data.common.events;
 
-import org.thethingsnetwork.data.messages.ActivationMessage;
+import org.thethingsnetwork.data.common.messages.ActivationMessage;
 import org.thethingsnetwork.data.common.Subscribable;
 
 /**

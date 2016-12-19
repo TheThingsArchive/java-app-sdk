@@ -29,9 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.thethingsnetwork.data.messages.ActivationMessage;
-import org.thethingsnetwork.data.messages.DownlinkMessage;
-import org.thethingsnetwork.data.messages.RawMessage;
+import org.thethingsnetwork.data.common.messages.ActivationMessage;
+import org.thethingsnetwork.data.common.messages.DataMessage;
+import org.thethingsnetwork.data.common.messages.DownlinkMessage;
+import org.thethingsnetwork.data.common.messages.RawMessage;
 
 /**
  * This is an abstract representation of the methods any real-time TTN client should provide
@@ -119,7 +120,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final String _devId, final String _field, final BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an uplink event handler using device filter
@@ -129,7 +130,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final String _devId, final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final String _devId, final BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an uplink event handler
@@ -138,7 +139,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an activation event handler using device filter
