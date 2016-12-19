@@ -21,29 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.data.common;
-
-import java.util.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
+package org.thethingsnetwork.data.messages;
 
 /**
- * This is a wrapper class for JSONObject to provide support for base64 encoded payload
  *
  * @author Romain Cambier
  */
-public class Message extends JSONObject {
-
-    public byte[] getBinary(String _key) {
-        Object object = get(_key);
-        if (object instanceof String) {
-            return Base64.getDecoder().decode((String) object);
-        }
-        throw new JSONException("JSONObject[" + quote(_key) + "] is not a base64 decodable string.");
-    }
-
-    public Message(String _source) {
-        super(_source);
-    }
-
+public interface DataMessage {
+    
 }

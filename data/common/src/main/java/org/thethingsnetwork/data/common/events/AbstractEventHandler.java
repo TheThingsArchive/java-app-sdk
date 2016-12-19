@@ -23,8 +23,8 @@
  */
 package org.thethingsnetwork.data.common.events;
 
-import org.json.JSONObject;
 import org.thethingsnetwork.data.common.Subscribable;
+import org.thethingsnetwork.data.messages.RawMessage;
 
 /**
  *
@@ -32,7 +32,7 @@ import org.thethingsnetwork.data.common.Subscribable;
  */
 public abstract class AbstractEventHandler implements EventHandler {
 
-    public abstract void handle(String _devId, String _event, JSONObject _data);
+    public abstract void handle(String _devId, String _event, RawMessage _data);
 
     public abstract String getDevId();
 

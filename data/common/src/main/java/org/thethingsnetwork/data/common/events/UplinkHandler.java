@@ -23,8 +23,8 @@
  */
 package org.thethingsnetwork.data.common.events;
 
-import org.thethingsnetwork.data.common.Message;
 import org.thethingsnetwork.data.common.Subscribable;
+import org.thethingsnetwork.data.messages.DataMessage;
 
 /**
  *
@@ -32,21 +32,25 @@ import org.thethingsnetwork.data.common.Subscribable;
  */
 public abstract class UplinkHandler implements EventHandler {
 
-    public abstract void handle(String _devId, Object _data);
+    public abstract void handle(String _devId, DataMessage _data);
 
     public abstract String getDevId();
 
     public abstract String getField();
 
-    public boolean matches(String _devId) {
-        return getDevId() == null || _devId.equals(getDevId());
+    public boolean isField() {
+        return getField() != null;
     }
 
-    public Object transform(String _data) {
-        if (getField() == null) {
-            return new Message(_data);
+    public boolean matches(String _devId, String _field) {
+        if (getDevId() != null && !getDevId().equals(_devId)) {
+            return false;
         }
-        return _data;
+        if (getField() != null) {
+            return !(_field == null || !getField().equals(_field));
+        } else {
+            return _field == null;
+        }
     }
 
     @Override

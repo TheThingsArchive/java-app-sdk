@@ -21,34 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.data.common.events;
+package org.thethingsnetwork.data.messages;
 
-import org.thethingsnetwork.data.messages.ActivationMessage;
-import org.thethingsnetwork.data.common.Subscribable;
+import org.thethingsnetwork.data.common.Metadata;
 
 /**
  *
  * @author Romain Cambier
  */
-public abstract class ActivationHandler implements EventHandler {
+public class ActivationMessage {
 
-    public abstract void handle(String _devId, ActivationMessage _data);
-
-    public abstract String getDevId();
-
-    public boolean matches(String _devId) {
-        return getDevId() == null || _devId.equals(getDevId());
+    private String appEui;
+    private String devEui;
+    private String devAddr;
+    private Metadata metadata;
+    
+    private ActivationMessage(){
+        
     }
 
-    @Override
-    public void subscribe(Subscribable _client) throws Exception {
-        _client.subscibe(new String[]{
-            _client.getWordWildcard(),
-            _client.getWordWildcard(),
-            (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
-            "events",
-            "activations"
-        });
+    public String getAppEui() {
+        return appEui;
     }
 
+    public String getDevEui() {
+        return devEui;
+    }
+
+    public String getDevAddr() {
+        return devAddr;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+    
+    
 }

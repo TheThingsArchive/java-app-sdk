@@ -23,17 +23,31 @@
  */
 package org.thethingsnetwork.data.common;
 
-import java.nio.ByteBuffer;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.json.JSONObject;
+import org.thethingsnetwork.data.messages.ActivationMessage;
+import org.thethingsnetwork.data.messages.DownlinkMessage;
+import org.thethingsnetwork.data.messages.RawMessage;
 
 /**
  * This is an abstract representation of the methods any real-time TTN client should provide
  *
  * @author Romain Cambier
  */
-public interface AbstractClient {
+public abstract class AbstractClient {
+
+    public static final ObjectMapper MAPPER = new ObjectMapper();
+
+    static {
+        MAPPER
+                .setVisibility(PropertyAccessor.ALL, Visibility.NONE)
+                .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+    }
 
     /**
      * Start the client
@@ -41,7 +55,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient start() throws Exception;
+    public abstract AbstractClient start() throws Exception;
 
     /**
      * Stop the client, waiting for max 5000 ms
@@ -49,7 +63,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient end() throws Exception;
+    public abstract AbstractClient end() throws Exception;
 
     /**
      * Stop the client, waiting for max the provided timeout
@@ -58,7 +72,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient end(long _timeout) throws Exception;
+    public abstract AbstractClient end(long _timeout) throws Exception;
 
     /**
      * Force-stop the client in case end() does not work.
@@ -66,7 +80,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient endNow() throws Exception;
+    public abstract AbstractClient endNow() throws Exception;
 
     /**
      * Send a downlink message using raw data
@@ -76,27 +90,7 @@ public interface AbstractClient {
      * @param _port The port to use for the message
      * @throws Exception in case something goes wrong
      */
-    public void send(String _devId, byte[] _payload, int _port) throws Exception;
-
-    /**
-     * Send a downlink message using pre-registered encoder
-     *
-     * @param _devId The devId to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws Exception in case something goes wrong
-     */
-    public void send(String _devId, JSONObject _payload, int _port) throws Exception;
-
-    /**
-     * Send a downlink message using raw data
-     *
-     * @param _devId The devId to send the message to
-     * @param _payload The payload to be sent
-     * @param _port The port to use for the message
-     * @throws Exception in case something goes wrong
-     */
-    public void send(String _devId, ByteBuffer _payload, int _port) throws Exception;
+    public abstract void send(String _devId, DownlinkMessage _payload, int _port) throws Exception;
 
     /**
      * Register a connection event handler
@@ -105,7 +99,7 @@ public interface AbstractClient {
      * @return the Connection instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onConnected(final Consumer<Connection> _handler) throws Exception;
+    public abstract AbstractClient onConnected(final Consumer<Connection> _handler) throws Exception;
 
     /**
      * Register an error event handler
@@ -114,7 +108,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onError(final Consumer<Throwable> _handler) throws Exception;
+    public abstract AbstractClient onError(final Consumer<Throwable> _handler) throws Exception;
 
     /**
      * Register an uplink event handler using device and field filters
@@ -125,7 +119,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) throws Exception;
 
     /**
      * Register an uplink event handler using device filter
@@ -135,7 +129,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onMessage(final String _devId, final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final String _devId, final BiConsumer<String, Object> _handler) throws Exception;
 
     /**
      * Register an uplink event handler
@@ -144,7 +138,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onMessage(final BiConsumer<String, Object> _handler) throws Exception;
+    public abstract AbstractClient onMessage(final BiConsumer<String, Object> _handler) throws Exception;
 
     /**
      * Register an activation event handler using device filter
@@ -154,7 +148,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) throws Exception;
+    public abstract AbstractClient onActivation(final String _devId, final BiConsumer<String, ActivationMessage> _handler) throws Exception;
 
     /**
      * Register an activation event handler
@@ -163,7 +157,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onActivation(final BiConsumer<String, JSONObject> _handler) throws Exception;
+    public abstract AbstractClient onActivation(final BiConsumer<String, ActivationMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler using device and event filters
@@ -174,7 +168,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onDevice(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) throws Exception;
+    public abstract AbstractClient onDevice(final String _devId, final String _event, final TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler using device filter
@@ -184,7 +178,7 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onDevice(final String _devId, final TriConsumer<String, String, JSONObject> _handler) throws Exception;
+    public abstract AbstractClient onDevice(final String _devId, final TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler
@@ -193,6 +187,6 @@ public interface AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public AbstractClient onDevice(final TriConsumer<String, String, JSONObject> _handler) throws Exception;
+    public abstract AbstractClient onDevice(final TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
 }

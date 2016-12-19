@@ -21,34 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.data.common.events;
+package org.thethingsnetwork.data.messages;
 
-import org.thethingsnetwork.data.messages.ActivationMessage;
-import org.thethingsnetwork.data.common.Subscribable;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
+import org.thethingsnetwork.data.common.Metadata;
 
 /**
+ * This is a wrapper class for JSONObject to provide support for base64 encoded payload
  *
  * @author Romain Cambier
  */
-public abstract class ActivationHandler implements EventHandler {
+public class UplinkMessage implements DataMessage {
 
-    public abstract void handle(String _devId, ActivationMessage _data);
+    private int port;
+    private int counter;
+    private String payloadRaw;
+    private Map<String, Object> payloadFields;
+    private Metadata metadata;
 
-    public abstract String getDevId();
+    private UplinkMessage() {
 
-    public boolean matches(String _devId) {
-        return getDevId() == null || _devId.equals(getDevId());
     }
 
-    @Override
-    public void subscribe(Subscribable _client) throws Exception {
-        _client.subscibe(new String[]{
-            _client.getWordWildcard(),
-            _client.getWordWildcard(),
-            (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
-            "events",
-            "activations"
-        });
+    public int getPort() {
+        return port;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public byte[] getPayloadRaw() {
+        return Base64.getDecoder().decode(payloadRaw);
+    }
+
+    public Map<String, Object> getPayloadFields() {
+        return Collections.unmodifiableMap(payloadFields);
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
     }
 
 }
