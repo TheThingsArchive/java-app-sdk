@@ -31,8 +31,6 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,8 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.json.JSONObject;
 import org.thethingsnetwork.data.common.AbstractClient;
+import static org.thethingsnetwork.data.common.AbstractClient.MAPPER;
 import org.thethingsnetwork.data.common.Subscribable;
 import org.thethingsnetwork.data.common.TriConsumer;
 import org.thethingsnetwork.data.common.events.AbstractEventHandler;
@@ -53,12 +51,17 @@ import org.thethingsnetwork.data.common.events.ConnectHandler;
 import org.thethingsnetwork.data.common.events.ErrorHandler;
 import org.thethingsnetwork.data.common.events.EventHandler;
 import org.thethingsnetwork.data.common.events.UplinkHandler;
+import org.thethingsnetwork.data.common.messages.ActivationMessage;
+import org.thethingsnetwork.data.common.messages.DataMessage;
+import org.thethingsnetwork.data.common.messages.DownlinkMessage;
+import org.thethingsnetwork.data.common.messages.RawMessage;
+import org.thethingsnetwork.data.common.messages.UplinkMessage;
 
 /**
  *
  * @author Romain Cambier
  */
-public class Client implements AbstractClient {
+public class Client extends AbstractClient {
 
     /**
      * Connection settings
@@ -141,24 +144,43 @@ public class Client implements AbstractClient {
                 switch (tokens[3]) {
                     case "up":
                         if (handlers.containsKey(UplinkHandler.class)) {
-                            handlers.get(UplinkHandler.class).stream().forEach((handler) -> {
-                                executor.submit(() -> {
-                                    try {
-                                        UplinkHandler uh = (UplinkHandler) handler;
-                                        if (uh.matches(tokens[2])) {
-                                            uh.handle(tokens[2], uh.transform(new String(body)));
-                                        }
-                                    } catch (final Exception ex) {
-                                        if (handlers.containsKey(ErrorHandler.class)) {
-                                            handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
-                                                executor.submit(() -> {
-                                                    ((ErrorHandler) handler1).safelyHandle(ex);
-                                                });
-                                            });
-                                        }
-                                    }
-                                });
-                            });
+                            String field;
+                            if (tokens.length > 4) {
+                                field = concat(4, tokens);
+                            } else {
+                                field = null;
+                            }
+                            handlers.get(UplinkHandler.class).stream()
+                                    .forEach((handler) -> {
+                                        executor.submit(() -> {
+                                            try {
+                                                UplinkHandler uh = (UplinkHandler) handler;
+
+                                                if (uh.matches(tokens[2], field)) {
+                                                    if (uh.isField()) {
+                                                        uh.handle(tokens[2], new RawMessage() {
+                                                            String str = new String(body);
+
+                                                            @Override
+                                                            public String asString() {
+                                                                return str;
+                                                            }
+                                                        });
+                                                    } else {
+                                                        uh.handle(tokens[2], MAPPER.readValue(body, UplinkMessage.class));
+                                                    }
+                                                }
+                                            } catch (final Exception ex) {
+                                                if (handlers.containsKey(ErrorHandler.class)) {
+                                                    handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
+                                                        executor.submit(() -> {
+                                                            ((ErrorHandler) handler1).safelyHandle(ex);
+                                                        });
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    });
                         }
                         break;
                     case "events":
@@ -171,7 +193,7 @@ public class Client implements AbstractClient {
                                                 try {
                                                     ActivationHandler ah = (ActivationHandler) handler;
                                                     if (ah.matches(tokens[2])) {
-                                                        ah.handle(tokens[2], new JSONObject(new String(body)));
+                                                        ah.handle(tokens[2], MAPPER.readValue(body, ActivationMessage.class));
                                                     }
                                                 } catch (final Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
@@ -194,7 +216,14 @@ public class Client implements AbstractClient {
                                                     AbstractEventHandler aeh = (AbstractEventHandler) handler;
                                                     String event = concat(4, tokens);
                                                     if (aeh.matches(tokens[2], event)) {
-                                                        aeh.handle(tokens[2], event, new JSONObject(new String(body)));
+                                                        aeh.handle(tokens[2], event, new RawMessage() {
+                                                            String str = new String(body);
+
+                                                            @Override
+                                                            public String asString() {
+                                                                return str;
+                                                            }
+                                                        });
                                                     }
                                                 } catch (final Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
@@ -304,30 +333,8 @@ public class Client implements AbstractClient {
     }
 
     @Override
-    public void send(String _devId, byte[] _payload, int _port) throws IOException {
-        JSONObject data = new JSONObject();
-        data.put("payload_raw", Base64.getEncoder().encodeToString(_payload));
-        data.put("port", _port != 0 ? _port : 1);
-        channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
-    }
-
-    @Override
-    public void send(String _devId, JSONObject _payload, int _port) throws IOException {
-        JSONObject data = new JSONObject();
-        data.put("payload_fields", _payload);
-        data.put("port", _port != 0 ? _port : 1);
-        channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
-    }
-
-    @Override
-    public void send(String _devId, ByteBuffer _payload, int _port) throws IOException {
-        JSONObject data = new JSONObject();
-        _payload.rewind();
-        byte[] payload = new byte[_payload.capacity() - _payload.remaining()];
-        _payload.get(payload);
-        data.put("payload_fields", Base64.getEncoder().encodeToString(payload));
-        data.put("port", _port != 0 ? _port : 1);
-        channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, data.toString().getBytes());
+    public void send(String _devId, DownlinkMessage _payload, int _port) throws IOException {
+        channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, MAPPER.writeValueAsBytes(_payload));
     }
 
     @Override
@@ -366,7 +373,7 @@ public class Client implements AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, Object> _handler) {
+    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, DataMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -375,7 +382,7 @@ public class Client implements AbstractClient {
         }
         handlers.get(UplinkHandler.class).add(new UplinkHandler() {
             @Override
-            public void handle(String _devId, Object _data) {
+            public void handle(String _devId, DataMessage _data) {
                 _handler.accept(_devId, _data);
             }
 
@@ -393,17 +400,17 @@ public class Client implements AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final BiConsumer<String, Object> _handler) {
+    public Client onMessage(final String _devId, final BiConsumer<String, DataMessage> _handler) {
         return onMessage(_devId, null, _handler);
     }
 
     @Override
-    public Client onMessage(final BiConsumer<String, Object> _handler) {
+    public Client onMessage(final BiConsumer<String, DataMessage> _handler) {
         return onMessage(null, null, _handler);
     }
 
     @Override
-    public Client onActivation(final String _devId, final BiConsumer<String, JSONObject> _handler) {
+    public Client onActivation(final String _devId, final BiConsumer<String, ActivationMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -412,7 +419,7 @@ public class Client implements AbstractClient {
         }
         handlers.get(ActivationHandler.class).add(new ActivationHandler() {
             @Override
-            public void handle(String _devId, JSONObject _data) {
+            public void handle(String _devId, ActivationMessage _data) {
                 _handler.accept(_devId, _data);
             }
 
@@ -425,12 +432,12 @@ public class Client implements AbstractClient {
     }
 
     @Override
-    public Client onActivation(final BiConsumer<String, JSONObject> _handler) {
+    public Client onActivation(final BiConsumer<String, ActivationMessage> _handler) {
         return onActivation(null, _handler);
     }
 
     @Override
-    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, JSONObject> _handler) {
+    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, RawMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -439,7 +446,7 @@ public class Client implements AbstractClient {
         }
         handlers.get(AbstractEventHandler.class).add(new AbstractEventHandler() {
             @Override
-            public void handle(String _devId, String _event, JSONObject _data) {
+            public void handle(String _devId, String _event, RawMessage _data) {
                 _handler.accept(_devId, _event, _data);
             }
 
@@ -457,12 +464,12 @@ public class Client implements AbstractClient {
     }
 
     @Override
-    public Client onDevice(final String _devId, final TriConsumer<String, String, JSONObject> _handler) {
+    public Client onDevice(final String _devId, final TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(_devId, null, _handler);
     }
 
     @Override
-    public Client onDevice(final TriConsumer<String, String, JSONObject> _handler) {
+    public Client onDevice(final TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(null, null, _handler);
     }
 }
