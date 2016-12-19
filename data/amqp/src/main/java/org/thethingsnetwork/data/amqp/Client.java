@@ -132,12 +132,12 @@ public class Client extends AbstractClient {
         connection = factory.newConnection();
         channel = connection.createChannel();
 
-        final String queue = channel.queueDeclare().getQueue();
+        String queue = channel.queueDeclare().getQueue();
 
         channel.basicConsume(queue, new DefaultConsumer(channel) {
             @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, final byte[] body) throws IOException {
-                final String[] tokens = envelope.getRoutingKey().split("\\.");
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                String[] tokens = envelope.getRoutingKey().split("\\.");
                 if (tokens.length < 4) {
                     return;
                 }
@@ -170,7 +170,7 @@ public class Client extends AbstractClient {
                                                         uh.handle(tokens[2], MAPPER.readValue(body, UplinkMessage.class));
                                                     }
                                                 }
-                                            } catch (final Exception ex) {
+                                            } catch (Exception ex) {
                                                 if (handlers.containsKey(ErrorHandler.class)) {
                                                     handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
                                                         executor.submit(() -> {
@@ -195,7 +195,7 @@ public class Client extends AbstractClient {
                                                     if (ah.matches(tokens[2])) {
                                                         ah.handle(tokens[2], MAPPER.readValue(body, ActivationMessage.class));
                                                     }
-                                                } catch (final Exception ex) {
+                                                } catch (Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
                                                         handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
                                                             executor.submit(() -> {
@@ -225,7 +225,7 @@ public class Client extends AbstractClient {
                                                             }
                                                         });
                                                     }
-                                                } catch (final Exception ex) {
+                                                } catch (Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
                                                         handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
                                                             executor.submit(() -> {
@@ -278,7 +278,7 @@ public class Client extends AbstractClient {
                 executor.submit(() -> {
                     try {
                         ((ConnectHandler) handler).handle(() -> channel);
-                    } catch (final Exception ex) {
+                    } catch (Exception ex) {
                         if (handlers.containsKey(ErrorHandler.class)) {
                             handlers.get(ErrorHandler.class).stream().forEach((org.thethingsnetwork.data.common.events.EventHandler handler1) -> {
                                 executor.submit(() -> {
@@ -333,12 +333,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public void send(String _devId, DownlinkMessage _payload, int _port) throws IOException {
+    public void send(String _devId, DownlinkMessage _payload) throws IOException {
         channel.basicPublish(exchange, appId + "/devices/" + _devId + "/down", null, MAPPER.writeValueAsBytes(_payload));
     }
 
     @Override
-    public Client onConnected(final Consumer<org.thethingsnetwork.data.common.Connection> _handler) {
+    public Client onConnected(Consumer<org.thethingsnetwork.data.common.Connection> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -356,7 +356,7 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onError(final Consumer<Throwable> _handler) {
+    public Client onError(Consumer<Throwable> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -373,7 +373,7 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(String _devId, String _field, BiConsumer<String, DataMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -400,17 +400,17 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(String _devId, BiConsumer<String, DataMessage> _handler) {
         return onMessage(_devId, null, _handler);
     }
 
     @Override
-    public Client onMessage(final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(BiConsumer<String, DataMessage> _handler) {
         return onMessage(null, null, _handler);
     }
 
     @Override
-    public Client onActivation(final String _devId, final BiConsumer<String, ActivationMessage> _handler) {
+    public Client onActivation(String _devId, BiConsumer<String, ActivationMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -432,12 +432,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onActivation(final BiConsumer<String, ActivationMessage> _handler) {
+    public Client onActivation(BiConsumer<String, ActivationMessage> _handler) {
         return onActivation(null, _handler);
     }
 
     @Override
-    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(String _devId, String _event, TriConsumer<String, String, RawMessage> _handler) {
         if (connection != null) {
             throw new RuntimeException("Already connected");
         }
@@ -464,12 +464,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onDevice(final String _devId, final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(String _devId, TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(_devId, null, _handler);
     }
 
     @Override
-    public Client onDevice(final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(null, null, _handler);
     }
 }

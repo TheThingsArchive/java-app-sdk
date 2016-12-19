@@ -164,7 +164,7 @@ public class Client extends AbstractClient {
         mqttClient.connect(connOpts);
         mqttClient.setCallback(new MqttCallback() {
             @Override
-            public void connectionLost(final Throwable cause) {
+            public void connectionLost(Throwable cause) {
                 mqttClient = null;
                 if (handlers.containsKey(ErrorHandler.class)) {
                     handlers.get(ErrorHandler.class).stream().forEach((handler) -> {
@@ -176,8 +176,8 @@ public class Client extends AbstractClient {
             }
 
             @Override
-            public void messageArrived(String topic, final MqttMessage message) throws Exception {
-                final String[] tokens = topic.split("\\/");
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                String[] tokens = topic.split("\\/");
                 if (tokens.length < 4) {
                     return;
                 }
@@ -209,7 +209,7 @@ public class Client extends AbstractClient {
                                                         uh.handle(tokens[2], MAPPER.readValue(message.getPayload(), UplinkMessage.class));
                                                     }
                                                 }
-                                            } catch (final Exception ex) {
+                                            } catch (Exception ex) {
                                                 if (handlers.containsKey(ErrorHandler.class)) {
                                                     handlers.get(ErrorHandler.class).stream().forEach((handler1) -> {
                                                         executor.submit(() -> {
@@ -234,7 +234,7 @@ public class Client extends AbstractClient {
                                                     if (ah.matches(tokens[2])) {
                                                         ah.handle(tokens[2], MAPPER.readValue(message.getPayload(), ActivationMessage.class));
                                                     }
-                                                } catch (final Exception ex) {
+                                                } catch (Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
                                                         handlers.get(ErrorHandler.class).stream().forEach((handler1) -> {
                                                             executor.submit(() -> {
@@ -264,7 +264,7 @@ public class Client extends AbstractClient {
                                                             }
                                                         });
                                                     }
-                                                } catch (final Exception ex) {
+                                                } catch (Exception ex) {
                                                     if (handlers.containsKey(ErrorHandler.class)) {
                                                         handlers.get(ErrorHandler.class).stream().forEach((handler1) -> {
                                                             executor.submit(() -> {
@@ -324,7 +324,7 @@ public class Client extends AbstractClient {
                 executor.submit(() -> {
                     try {
                         ((ConnectHandler) handler).handle(() -> mqttClient);
-                    } catch (final Exception ex) {
+                    } catch (Exception ex) {
                         if (handlers.containsKey(ErrorHandler.class)) {
                             handlers.get(ErrorHandler.class).stream().forEach((handler1) -> {
                                 executor.submit(() -> {
@@ -379,12 +379,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public void send(String _devId, DownlinkMessage _payload, int _port) throws Exception {
+    public void send(String _devId, DownlinkMessage _payload) throws Exception {
         mqttClient.publish(appId + "/devices/" + _devId + "/down", MAPPER.writeValueAsBytes(_payload), 0, false);
     }
 
     @Override
-    public Client onConnected(final Consumer<Connection> _handler) {
+    public Client onConnected(Consumer<Connection> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -401,7 +401,7 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onError(final Consumer<Throwable> _handler) {
+    public Client onError(Consumer<Throwable> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -418,7 +418,7 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final String _field, final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(String _devId, String _field, BiConsumer<String, DataMessage> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -445,17 +445,17 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onMessage(final String _devId, final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(String _devId, BiConsumer<String, DataMessage> _handler) {
         return onMessage(_devId, null, _handler);
     }
 
     @Override
-    public Client onMessage(final BiConsumer<String, DataMessage> _handler) {
+    public Client onMessage(BiConsumer<String, DataMessage> _handler) {
         return onMessage(null, null, _handler);
     }
 
     @Override
-    public Client onActivation(final String _devId, final BiConsumer<String, ActivationMessage> _handler) {
+    public Client onActivation(String _devId, BiConsumer<String, ActivationMessage> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -477,12 +477,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onActivation(final BiConsumer<String, ActivationMessage> _handler) {
+    public Client onActivation(BiConsumer<String, ActivationMessage> _handler) {
         return onActivation(null, _handler);
     }
 
     @Override
-    public Client onDevice(final String _devId, final String _event, final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(String _devId, String _event, TriConsumer<String, String, RawMessage> _handler) {
         if (mqttClient != null) {
             throw new RuntimeException("Already connected");
         }
@@ -509,12 +509,12 @@ public class Client extends AbstractClient {
     }
 
     @Override
-    public Client onDevice(final String _devId, final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(String _devId, TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(_devId, null, _handler);
     }
 
     @Override
-    public Client onDevice(final TriConsumer<String, String, RawMessage> _handler) {
+    public Client onDevice(TriConsumer<String, String, RawMessage> _handler) {
         return onDevice(null, null, _handler);
     }
 

@@ -88,10 +88,9 @@ public abstract class AbstractClient {
      *
      * @param _devId The devId to send the message to
      * @param _payload The payload to be sent
-     * @param _port The port to use for the message
      * @throws Exception in case something goes wrong
      */
-    public abstract void send(String _devId, DownlinkMessage _payload, int _port) throws Exception;
+    public abstract void send(String _devId, DownlinkMessage _payload) throws Exception;
 
     /**
      * Register a connection event handler
@@ -100,7 +99,7 @@ public abstract class AbstractClient {
      * @return the Connection instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onConnected(final Consumer<Connection> _handler) throws Exception;
+    public abstract AbstractClient onConnected(Consumer<Connection> _handler) throws Exception;
 
     /**
      * Register an error event handler
@@ -109,7 +108,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onError(final Consumer<Throwable> _handler) throws Exception;
+    public abstract AbstractClient onError(Consumer<Throwable> _handler) throws Exception;
 
     /**
      * Register an uplink event handler using device and field filters
@@ -120,7 +119,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final String _devId, final String _field, final BiConsumer<String, DataMessage> _handler) throws Exception;
+    public abstract AbstractClient onMessage(String _devId, String _field, BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an uplink event handler using device filter
@@ -130,7 +129,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final String _devId, final BiConsumer<String, DataMessage> _handler) throws Exception;
+    public abstract AbstractClient onMessage(String _devId, BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an uplink event handler
@@ -139,7 +138,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onMessage(final BiConsumer<String, DataMessage> _handler) throws Exception;
+    public abstract AbstractClient onMessage(BiConsumer<String, DataMessage> _handler) throws Exception;
 
     /**
      * Register an activation event handler using device filter
@@ -149,7 +148,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onActivation(final String _devId, final BiConsumer<String, ActivationMessage> _handler) throws Exception;
+    public abstract AbstractClient onActivation(String _devId, BiConsumer<String, ActivationMessage> _handler) throws Exception;
 
     /**
      * Register an activation event handler
@@ -158,7 +157,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onActivation(final BiConsumer<String, ActivationMessage> _handler) throws Exception;
+    public abstract AbstractClient onActivation(BiConsumer<String, ActivationMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler using device and event filters
@@ -169,7 +168,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onDevice(final String _devId, final String _event, final TriConsumer<String, String, RawMessage> _handler) throws Exception;
+    public abstract AbstractClient onDevice(String _devId, String _event, TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler using device filter
@@ -179,7 +178,7 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onDevice(final String _devId, final TriConsumer<String, String, RawMessage> _handler) throws Exception;
+    public abstract AbstractClient onDevice(String _devId, TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
     /**
      * Register a default event handler
@@ -188,6 +187,6 @@ public abstract class AbstractClient {
      * @return the Client instance
      * @throws Exception in case something goes wrong
      */
-    public abstract AbstractClient onDevice(final TriConsumer<String, String, RawMessage> _handler) throws Exception;
+    public abstract AbstractClient onDevice(TriConsumer<String, String, RawMessage> _handler) throws Exception;
 
 }
