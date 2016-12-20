@@ -21,14 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.grant;
+package org.thethingsnetwork.account.async.auth.grant;
 
 import java.net.URI;
 import java.util.Base64;
 import okhttp3.HttpUrl;
 import okhttp3.RequestBody;
-import org.thethingsnetwork.account.auth.token.JsonWebToken;
-import org.thethingsnetwork.account.common.HttpRequest;
+import org.thethingsnetwork.account.auth.grant.GrantType;
+import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
+import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -36,7 +37,7 @@ import rx.Subscriber;
  *
  * @author Romain Cambier
  */
-public class ApplicationPassword extends GrantType {
+public class AsyncApplicationPassword extends GrantType {
 
     private final String clientId;
     private final String clientSecret;
@@ -44,7 +45,7 @@ public class ApplicationPassword extends GrantType {
     private final String key;
     private final URI accountServer;
 
-    public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret, URI _accountServer) {
+    public AsyncApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret, URI _accountServer) {
         if (_key == null) {
             throw new IllegalArgumentException("key can not be null");
         }
@@ -67,7 +68,7 @@ public class ApplicationPassword extends GrantType {
         clientSecret = _clientSecret;
     }
 
-    public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret) {
+    public AsyncApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret) {
         this(_appId, _key, _clientId, _clientSecret, GrantType.DEFAULT_ACCOUNT_SERVER);
     }
 
@@ -80,7 +81,7 @@ public class ApplicationPassword extends GrantType {
         return "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
     }
 
-    public Observable<JsonWebToken> getToken() {
+    public Observable<AsyncJsonWebToken> getToken() {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
                     try {
@@ -108,13 +109,13 @@ public class ApplicationPassword extends GrantType {
                     t.getBuilder().header("Authorization", getBasicAuthHeader());
                 })
                 .flatMap((HttpRequest t) -> t.doExecuteForType(TokenResponse.class))
-                .map((TokenResponse t) -> new JsonWebToken(t.accessToken, System.currentTimeMillis() + 1000 * t.expiresIn, accountServer));
+                .map((TokenResponse t) -> new AsyncJsonWebToken(t.accessToken, System.currentTimeMillis() + 1000 * t.expiresIn, accountServer));
     }
 
     private class TokenRequest {
 
-        private final String username = ApplicationPassword.this.appId;
-        private final String password = ApplicationPassword.this.key;
+        private final String username = AsyncApplicationPassword.this.appId;
+        private final String password = AsyncApplicationPassword.this.key;
         private final String grantType = "password";
     }
 

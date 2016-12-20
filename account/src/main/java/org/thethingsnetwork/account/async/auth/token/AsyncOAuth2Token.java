@@ -21,32 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.common;
+package org.thethingsnetwork.account.async.auth.token;
+
+import java.net.URI;
+import rx.Observable;
 
 /**
  *
  * @author Romain Cambier
  */
-public class HttpException extends Exception {
+public interface AsyncOAuth2Token {
 
-    private final int status;
-    private final String body;
+    public boolean hasRefresh();
 
-    public HttpException(int _status, String _msg) {
-        this(_status, _msg, null);
-    }
+    public Observable<? extends AsyncOAuth2Token> refresh();
+    
+    public boolean isExpired();
 
-    public HttpException(int _status, String _msg, String _body) {
-        super(_msg);
-        status = _status;
-        body = _body;
-    }
+    public String getToken();
+    
+    public String getRawToken();
+    
+    public URI getAccountServer();
 
-    public int getStatus() {
-        return status;
-    }
-
-    public String getBody() {
-        return body;
-    }
 }

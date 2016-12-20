@@ -26,12 +26,12 @@ package org.thethingsnetwork.account.async;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.thethingsnetwork.account.AbstractApplication;
-import org.thethingsnetwork.account.AccessKey;
-import org.thethingsnetwork.account.Collaborator;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
-import org.thethingsnetwork.account.common.HttpRequest;
+import org.thethingsnetwork.account.common.AbstractApplication;
+import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.Collaborator;
+import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 
 /**
  *
@@ -43,7 +43,7 @@ public class AsyncApplication implements AbstractApplication {
     private String name;
     private String created;
     @JsonIgnore
-    protected OAuth2Token creds;
+    protected AsyncOAuth2Token creds;
 
     private AsyncApplication() {
     }
@@ -74,7 +74,7 @@ public class AsyncApplication implements AbstractApplication {
     }
 
     @Override
-    public void updateCredentials(OAuth2Token _creds) {
+    public void updateCredentials(AsyncOAuth2Token _creds) {
         creds = _creds;
     }
 
@@ -85,7 +85,7 @@ public class AsyncApplication implements AbstractApplication {
         creds = _other.creds;
     }
 
-    public static Observable<AsyncApplication> findAll(OAuth2Token _creds) {
+    public static Observable<AsyncApplication> findAll(AsyncOAuth2Token _creds) {
         /**
          * GET /applications
          */
@@ -98,7 +98,7 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((AsyncApplication app) -> app.updateCredentials(_creds));
     }
 
-    public static Observable<AsyncApplication> create(OAuth2Token _creds, AbstractApplication _app) {
+    public static Observable<AsyncApplication> create(AsyncOAuth2Token _creds, AbstractApplication _app) {
         /**
          * POST /applications
          */
@@ -116,7 +116,7 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((AsyncApplication ap) -> ap.updateCredentials(_creds));
     }
 
-    public static Observable<AsyncApplication> findOne(OAuth2Token _creds, String _id) {
+    public static Observable<AsyncApplication> findOne(AsyncOAuth2Token _creds, String _id) {
         /**
          * GET /applications/{app_id}
          */
@@ -314,7 +314,7 @@ public class AsyncApplication implements AbstractApplication {
         return getRights(creds);
     }
 
-    public Observable<String> getRights(OAuth2Token _creds) {
+    public Observable<String> getRights(AsyncOAuth2Token _creds) {
         /**
          * GET /applications/{app_id}/rights
          */

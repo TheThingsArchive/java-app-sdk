@@ -21,14 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.grant;
+package org.thethingsnetwork.account.async.auth.grant;
 
 import java.net.URI;
 import java.util.Base64;
 import okhttp3.HttpUrl;
 import okhttp3.RequestBody;
-import org.thethingsnetwork.account.auth.token.RenewableJsonWebToken;
-import org.thethingsnetwork.account.common.HttpRequest;
+import org.thethingsnetwork.account.auth.grant.GrantType;
+import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
+import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -36,13 +37,13 @@ import rx.Subscriber;
  *
  * @author Romain Cambier
  */
-public class AuthorizationCode extends GrantType {
+public class AsyncAuthorizationCode extends GrantType {
 
     private final String clientId;
     private final String clientSecret;
     private final URI accountServer;
 
-    public AuthorizationCode(String _clientId, String _clientSecret, URI _accountServer) {
+    public AsyncAuthorizationCode(String _clientId, String _clientSecret, URI _accountServer) {
         if (_clientId == null) {
             throw new IllegalArgumentException("clientId can not be null");
         }
@@ -57,7 +58,7 @@ public class AuthorizationCode extends GrantType {
         accountServer = _accountServer;
     }
 
-    public AuthorizationCode(String _clientId, String _clientSecret) {
+    public AsyncAuthorizationCode(String _clientId, String _clientSecret) {
         this(_clientId, _clientSecret, GrantType.DEFAULT_ACCOUNT_SERVER);
     }
 
@@ -82,7 +83,7 @@ public class AuthorizationCode extends GrantType {
                 .build();
     }
 
-    public Observable<RenewableJsonWebToken> getToken(String _authorizationCode) {
+    public Observable<AsyncRenewableJsonWebToken> getToken(String _authorizationCode) {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
                     try {
@@ -110,10 +111,10 @@ public class AuthorizationCode extends GrantType {
                     t.getBuilder().header("Authorization", getBasicAuthHeader());
                 })
                 .flatMap((HttpRequest t) -> t.doExecuteForType(TokenResponse.class))
-                .map((TokenResponse t) -> new RenewableJsonWebToken(t.accessToken, System.currentTimeMillis() + 1000 * t.expiresIn, t.refreshToken, this));
+                .map((TokenResponse t) -> new AsyncRenewableJsonWebToken(t.accessToken, System.currentTimeMillis() + 1000 * t.expiresIn, t.refreshToken, this));
     }
 
-    public Observable<RenewableJsonWebToken> refreshToken(RenewableJsonWebToken _token) {
+    public Observable<AsyncRenewableJsonWebToken> refreshToken(AsyncRenewableJsonWebToken _token) {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
                     try {
@@ -146,7 +147,7 @@ public class AuthorizationCode extends GrantType {
 
     private class TokenRequest {
 
-        private String clientId = AuthorizationCode.this.clientId;
+        private String clientId = AsyncAuthorizationCode.this.clientId;
         private String grantType = "authorization_code";
         private String code;
 
@@ -166,7 +167,7 @@ public class AuthorizationCode extends GrantType {
 
     private class RefreshRequest {
 
-        private String clientId = AuthorizationCode.this.clientId;
+        private String clientId = AsyncAuthorizationCode.this.clientId;
         private String grantType = "refresh_token";
         private String refresh_token;
 

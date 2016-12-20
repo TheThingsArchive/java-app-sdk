@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account;
+package org.thethingsnetwork.account.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Collections;
@@ -32,28 +32,27 @@ import java.util.List;
  * @author Romain Cambier
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Collaborator {
+public class AccessKey {
 
-    private String username;
-    private String email;
+    private String name;
+    private String key;
     private List<String> rights;
 
-    public Collaborator() {
+    public AccessKey() {
 
     }
 
-    public Collaborator(String _username, List<String> _rights) {
-        username = _username;
-        email = null;
+    public AccessKey(String _name, List<String> _rights) {
+        name = _name;
         rights = _rights;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getKey() {
+        return key;
     }
 
     public List<String> getRights() {

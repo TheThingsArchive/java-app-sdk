@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.token;
+package org.thethingsnetwork.account.async.auth.token;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import okhttp3.HttpUrl;
 import okhttp3.RequestBody;
-import org.thethingsnetwork.account.common.HttpRequest;
+import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -36,13 +36,13 @@ import rx.Subscriber;
  *
  * @author Romain Cambier
  */
-public class JsonWebToken implements OAuth2Token {
+public class AsyncJsonWebToken implements AsyncOAuth2Token {
 
     private String token;
     private long expiration;
     private final URI accountServer;
 
-    public JsonWebToken(String _token, long _expiration, URI _accountServer) {
+    public AsyncJsonWebToken(String _token, long _expiration, URI _accountServer) {
         if (_token == null) {
             throw new IllegalArgumentException("token can not be null");
         }
@@ -63,7 +63,7 @@ public class JsonWebToken implements OAuth2Token {
     }
 
     @Override
-    public Observable<? extends OAuth2Token> refresh() {
+    public Observable<? extends AsyncJsonWebToken> refresh() {
         return Observable.error(new UnsupportedOperationException("Not supported."));
     }
 
@@ -94,7 +94,7 @@ public class JsonWebToken implements OAuth2Token {
         return accountServer;
     }
 
-    public Observable<? extends JsonWebToken> restrict(List<String> _claims) {
+    public Observable<? extends AsyncJsonWebToken> restrict(List<String> _claims) {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
                     try {
@@ -120,10 +120,10 @@ public class JsonWebToken implements OAuth2Token {
                         })
                 )
                 .flatMap((HttpRequest t) -> t.doExecuteForType(RestrictResponse.class))
-                .map((RestrictResponse t) -> new JsonWebToken(t.accessToken, expiration, accountServer));
+                .map((RestrictResponse t) -> new AsyncJsonWebToken(t.accessToken, expiration, accountServer));
     }
 
-    public Observable<? extends JsonWebToken> restrict(String... _claims) {
+    public Observable<? extends AsyncJsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 

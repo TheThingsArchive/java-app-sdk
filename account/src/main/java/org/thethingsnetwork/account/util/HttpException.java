@@ -21,41 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Collections;
-import java.util.List;
+package org.thethingsnetwork.account.util;
 
 /**
  *
  * @author Romain Cambier
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessKey {
+public class HttpException extends Exception {
 
-    private String name;
-    private String key;
-    private List<String> rights;
+    private final int status;
+    private final String body;
 
-    public AccessKey() {
-
+    public HttpException(int _status, String _msg) {
+        this(_status, _msg, null);
     }
 
-    public AccessKey(String _name, List<String> _rights) {
-        name = _name;
-        rights = _rights;
+    public HttpException(int _status, String _msg, String _body) {
+        super(_msg);
+        status = _status;
+        body = _body;
     }
 
-    public String getName() {
-        return name;
+    public int getStatus() {
+        return status;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public List<String> getRights() {
-        return Collections.unmodifiableList(rights);
+    public String getBody() {
+        return body;
     }
 }

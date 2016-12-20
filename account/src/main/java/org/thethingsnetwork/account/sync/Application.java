@@ -24,17 +24,17 @@
 package org.thethingsnetwork.account.sync;
 
 import java.util.List;
-import org.thethingsnetwork.account.AbstractApplication;
-import org.thethingsnetwork.account.AccessKey;
-import org.thethingsnetwork.account.Collaborator;
+import org.thethingsnetwork.account.common.AbstractApplication;
+import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.Collaborator;
 import org.thethingsnetwork.account.async.AsyncApplication;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 
 /**
  *
  * @author Romain Cambier
  */
-public class Application implements AbstractApplication {
+public class Application implements AbstractApplication{
 
     private final AsyncApplication wrapped;
 
@@ -46,7 +46,7 @@ public class Application implements AbstractApplication {
         wrapped = _wrap;
     }
 
-    public static List<Application> findAll(OAuth2Token _creds) {
+    public static List<Application> findAll(AsyncOAuth2Token _creds) {
         return AsyncApplication.findAll(_creds)
                 .map((AsyncApplication t) -> new Application(t))
                 .toList()
@@ -54,14 +54,14 @@ public class Application implements AbstractApplication {
                 .single();
     }
 
-    public static Application create(OAuth2Token _creds, AbstractApplication _app) {
+    public static Application create(AsyncOAuth2Token _creds, AbstractApplication _app) {
         return AsyncApplication.create(_creds, _app)
                 .map((AsyncApplication t) -> new Application(t))
                 .toBlocking()
                 .single();
     }
 
-    public static Application findOne(OAuth2Token _creds, String _id) {
+    public static Application findOne(AsyncOAuth2Token _creds, String _id) {
         return AsyncApplication.findOne(_creds, _id)
                 .map((AsyncApplication t) -> new Application(t))
                 .toBlocking()
@@ -171,7 +171,7 @@ public class Application implements AbstractApplication {
                 .single();
     }
 
-    public List<String> getRights(OAuth2Token _creds) {
+    public List<String> getRights(AsyncOAuth2Token _creds) {
         return wrapped.getRights(_creds)
                 .toList()
                 .toBlocking()
@@ -199,7 +199,7 @@ public class Application implements AbstractApplication {
     }
 
     @Override
-    public void updateCredentials(OAuth2Token _creds) {
+    public void updateCredentials(AsyncOAuth2Token _creds) {
         wrapped.updateCredentials(_creds);
     }
 

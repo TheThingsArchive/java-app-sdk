@@ -21,23 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.token;
+package org.thethingsnetwork.account.async.auth.token;
 
 import java.util.Arrays;
 import java.util.List;
-import org.thethingsnetwork.account.auth.grant.AuthorizationCode;
+import org.thethingsnetwork.account.async.auth.grant.AsyncAuthorizationCode;
 import rx.Observable;
 
 /**
  *
  * @author Romain Cambier
  */
-public class RenewableJsonWebToken extends JsonWebToken {
+public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
 
     private String refreshToken;
-    private final AuthorizationCode provider;
+    private final AsyncAuthorizationCode provider;
 
-    public RenewableJsonWebToken(String _token, long _expiration, String _refreshToken, AuthorizationCode _provider) {
+    public AsyncRenewableJsonWebToken(String _token, long _expiration, String _refreshToken, AsyncAuthorizationCode _provider) {
         super(_token, _expiration, _provider.getAccountServer());
         if (_refreshToken == null) {
             throw new IllegalArgumentException("refreshToken can not be null");
@@ -63,23 +63,23 @@ public class RenewableJsonWebToken extends JsonWebToken {
     }
 
     @Override
-    public Observable<? extends OAuth2Token> refresh() {
+    public Observable<AsyncRenewableJsonWebToken> refresh() {
         return provider.refreshToken(this);
     }
 
     @Override
-    public Observable<? extends JsonWebToken> restrict(List<String> _claims) {
-        RenewableJsonWebToken that = this;
+    public Observable<? extends AsyncJsonWebToken> restrict(List<String> _claims) {
+        AsyncRenewableJsonWebToken that = this;
         return super.restrict(_claims)
-                .map((JsonWebToken t) -> new RenewableJsonWebToken(t.getRawToken(), t.getExpiration(), "", provider) {
+                .map((AsyncJsonWebToken t) -> new AsyncRenewableJsonWebToken(t.getRawToken(), t.getExpiration(), "", provider) {
 
                     @Override
-                    public Observable<? extends OAuth2Token> refresh() {
+                    public Observable<AsyncRenewableJsonWebToken> refresh() {
                         return that.refresh()
-                                .map((OAuth2Token t1) -> (RenewableJsonWebToken) t1)
-                                .flatMap((RenewableJsonWebToken t1) -> t1
+                                .map((AsyncOAuth2Token t1) -> (AsyncRenewableJsonWebToken) t1)
+                                .flatMap((AsyncRenewableJsonWebToken t1) -> t1
                                         .restrict(_claims)
-                                        .map((JsonWebToken t2) -> {
+                                        .map((AsyncJsonWebToken t2) -> {
                                             refresh("", t2.getRawToken(), t1.getExpiration());
                                             return this;
                                         }));
@@ -89,11 +89,11 @@ public class RenewableJsonWebToken extends JsonWebToken {
     }
 
     @Override
-    public Observable<? extends JsonWebToken> restrict(String... _claims) {
+    public Observable<? extends AsyncJsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 
-    public RenewableJsonWebToken refresh(String _refreshToken, String _accessToken, long _expiration) {
+    public AsyncRenewableJsonWebToken refresh(String _refreshToken, String _accessToken, long _expiration) {
         setRefreshToken(_refreshToken);
         setToken(_accessToken);
         setExpiration(_expiration);

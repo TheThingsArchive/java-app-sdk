@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.common;
+package org.thethingsnetwork.account.util;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -37,7 +37,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -100,13 +100,13 @@ public class HttpRequest {
                 });
     }
 
-    public Observable<HttpRequest> inject(OAuth2Token _creds) {
+    public Observable<HttpRequest> inject(AsyncOAuth2Token _creds) {
         if (_creds == null) {
             return Observable.just(this);
         }
         if (_creds.isExpired()) {
             if (_creds.hasRefresh()) {
-                return _creds.refresh().flatMap((OAuth2Token t) -> inject(t));
+                return _creds.refresh().flatMap((AsyncOAuth2Token t) -> inject(t));
             } else {
                 return Observable.error(new Exception("non-renewable token expired"));
             }

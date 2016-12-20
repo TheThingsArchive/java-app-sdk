@@ -21,27 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.token;
+package org.thethingsnetwork.account.common;
 
-import java.net.URI;
-import rx.Observable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 
 /**
  *
  * @author Romain Cambier
  */
-public interface OAuth2Token {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public interface AbstractApplication {
 
-    public boolean hasRefresh();
+    public String getId();
 
-    public Observable<? extends OAuth2Token> refresh();
-    
-    public boolean isExpired();
+    public String getName();
 
-    public String getToken();
+    public String getCreated();
+
+    public void setName(String _name);
     
-    public String getRawToken();
-    
-    public URI getAccountServer();
+    public void updateCredentials(AsyncOAuth2Token _creds);
 
 }
