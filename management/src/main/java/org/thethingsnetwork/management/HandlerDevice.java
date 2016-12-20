@@ -23,10 +23,77 @@
  */
 package org.thethingsnetwork.management;
 
+import org.thethingsnetwork.management.proto.DeviceOuterClass;
+import org.thethingsnetwork.management.proto.HandlerOuterClass;
+import rx.Observable;
+import rx.Subscriber;
+
 /**
  *
  * @author Romain Cambier
  */
 public class HandlerDevice {
-    
+
+    private final String appId;
+    private final String devId;
+    private LorawanDevice lorawan;
+
+    private HandlerDevice(String _appId, String _devId, LorawanDevice _lorawan) {
+        appId = _appId;
+        devId = _devId;
+        lorawan = _lorawan;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public String getDevId() {
+        return devId;
+    }
+
+    public LorawanDevice getLorawan() {
+        return lorawan;
+    }
+
+    public static Observable<HandlerDevice> from(HandlerOuterClass.Device _proto) {
+
+        return LorawanDevice.from(_proto.getLorawanDevice())
+                .flatMap((LorawanDevice tt) -> Observable
+                        .create((Subscriber<? super HandlerDevice> t) -> {
+                            try {
+                                t.onNext(new HandlerDevice(
+                                        _proto.getAppId(),
+                                        _proto.getDevId(),
+                                        tt
+                                ));
+                                t.onCompleted();
+                            } catch (Exception ex) {
+                                t.onError(ex);
+                            }
+                        })
+                );
+
+    }
+
+    public Observable<HandlerOuterClass.Device> toProto() {
+
+        return lorawan.toProto()
+                .flatMap((DeviceOuterClass.Device tt) -> Observable
+                        .create((Subscriber<? super HandlerOuterClass.Device> t) -> {
+                            try {
+                                t.onNext(HandlerOuterClass.Device.newBuilder()
+                                        .setAppId(appId)
+                                        .setDevId(devId)
+                                        .setLorawanDevice(tt)
+                                        .build()
+                                );
+                                t.onCompleted();
+                            } catch (Exception ex) {
+                                t.onError(ex);
+                            }
+                        }));
+
+    }
+
 }

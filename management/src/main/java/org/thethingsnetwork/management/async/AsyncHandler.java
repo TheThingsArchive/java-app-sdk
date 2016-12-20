@@ -133,19 +133,47 @@ public class AsyncHandler {
     }
 
     public Observable<HandlerDevice> getDevices(HandlerApplication _application) {
-        return null;
+        return Observable
+                .from(stub.getDevicesForApplication(
+                        HandlerOuterClass.ApplicationIdentifier
+                        .newBuilder()
+                        .setAppId(_application.getAppId())
+                        .build()
+                ), Schedulers.io())
+                .flatMap((HandlerOuterClass.DeviceList t) -> Observable.from(t.getDevicesList()))
+                .flatMap((HandlerOuterClass.Device t) -> HandlerDevice.from(t));
     }
 
-    public Observable<HandlerDevice> getDevice(String _deviceId) {
-        return null;
+    public Observable<HandlerDevice> getDevice(HandlerApplication _application, String _deviceId) {
+        return Observable
+                .from(stub.getDevice(
+                        HandlerOuterClass.DeviceIdentifier
+                        .newBuilder()
+                        .setAppId(_application.getAppId())
+                        .setDevId(_deviceId)
+                        .build()
+                ), Schedulers.io())
+                .flatMap((HandlerOuterClass.Device t) -> HandlerDevice.from(t));
     }
 
     public Observable<HandlerDevice> setDevice(HandlerDevice _device) {
-        return null;
+        return _device.toProto()
+                .flatMap((HandlerOuterClass.Device tt) -> Observable
+                        .from(stub.setDevice(tt), Schedulers.io())
+                        .map((t) -> _device));
+
     }
 
     public Observable<HandlerDevice> deleteDevice(HandlerDevice _device) {
-        return null;
+        return Observable
+                .from(stub.deleteDevice(
+                        HandlerOuterClass.DeviceIdentifier
+                        .newBuilder()
+                        .setAppId(_device.getAppId())
+                        .setDevId(_device.getDevId())
+                        .build()
+                ), Schedulers.io())
+                .map((t) -> _device);
     }
 
 }
