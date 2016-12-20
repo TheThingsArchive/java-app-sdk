@@ -26,7 +26,7 @@ package org.thethingsnetwork.management.async;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.ByteArrayInputStream;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.management.proto.DiscoveryGrpc;
 import org.thethingsnetwork.management.proto.DiscoveryOuterClass;
 import org.thethingsnetwork.management.proto.DiscoveryOuterClass.GetRequest;
@@ -70,20 +70,20 @@ public class AsyncDiscovery {
         return from(HOST, PORT);
     }
 
-    public Observable<AsyncHandler> getHandler(OAuth2Token _creds, String _handlerId) {
+    public Observable<AsyncHandler> getHandler(AsyncOAuth2Token _creds, String _handlerId) {
         return Observable
                 .from(stub.get(GetRequest.newBuilder().setId(_handlerId).setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
                 .flatMap((DiscoveryOuterClass.Announcement t) -> from(_creds, t));
     }
 
-    public Observable<AsyncHandler> getHandlers(OAuth2Token _creds) {
+    public Observable<AsyncHandler> getHandlers(AsyncOAuth2Token _creds) {
         return Observable
                 .from(stub.getAll(DiscoveryOuterClass.GetServiceRequest.newBuilder().setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
                 .flatMap((DiscoveryOuterClass.AnnouncementsResponse t) -> Observable.from(t.getServicesList()))
                 .flatMap((DiscoveryOuterClass.Announcement t) -> from(_creds, t));
     }
 
-    private Observable<AsyncHandler> from(OAuth2Token _creds, DiscoveryOuterClass.Announcement _announcement) {
+    private Observable<AsyncHandler> from(AsyncOAuth2Token _creds, DiscoveryOuterClass.Announcement _announcement) {
         return Observable.from(_announcement.getNetAddress().split(","))
                 .flatMap((String tt) -> Observable
                         .create((Subscriber<? super Server> t) -> {

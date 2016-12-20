@@ -34,8 +34,8 @@ import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
 import java.io.InputStream;
-import org.thethingsnetwork.account.AbstractApplication;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
+import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.management.HandlerApplication;
 import org.thethingsnetwork.management.HandlerDevice;
 import org.thethingsnetwork.management.proto.ApplicationManagerGrpc;
@@ -56,7 +56,7 @@ public class AsyncHandler {
         stub = _stub;
     }
 
-    public static Observable<AsyncHandler> from(OAuth2Token _credentials, String _host, int _port, InputStream _certificate) {
+    public static Observable<AsyncHandler> from(AsyncOAuth2Token _credentials, String _host, int _port, InputStream _certificate) {
 
         return Observable
                 .create((Subscriber<? super AsyncHandler> t) -> {
