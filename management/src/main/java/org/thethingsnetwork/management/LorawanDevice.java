@@ -51,7 +51,7 @@ public class LorawanDevice {
     private String activationConstraints;
     private long lastSeen;
 
-    public LorawanDevice(byte[] _appEui, byte[] _devEui, String _appId, String _devId, byte[] _devAddr, byte[] _nwkSKey, byte[] _appSKey, byte[] _appKey, int _fCntUp, int _fCntDown, boolean _disableFCntCheck, boolean _uses32BitFCnt, String _activationConstraints, long _lastSeen) {
+    private LorawanDevice(byte[] _appEui, byte[] _devEui, String _appId, String _devId, byte[] _devAddr, byte[] _nwkSKey, byte[] _appSKey, byte[] _appKey, int _fCntUp, int _fCntDown, boolean _disableFCntCheck, boolean _uses32BitFCnt, String _activationConstraints, long _lastSeen) {
         appEui = _appEui;
         devEui = _devEui;
         appId = _appId;
@@ -66,6 +66,38 @@ public class LorawanDevice {
         uses32BitFCnt = _uses32BitFCnt;
         activationConstraints = _activationConstraints;
         lastSeen = _lastSeen;
+    }
+
+    public static LorawanDevice createOTAA(String _appId, String _devId, byte[] _appEui, byte[] _devEui, byte[] _appKey) {
+        if (_appEui.length != 8) {
+            throw new IllegalArgumentException("appEui should be 8 bytes long");
+        }
+        if (_devEui.length != 8) {
+            throw new IllegalArgumentException("devEui should be 8 bytes long");
+        }
+        if (_appKey.length != 16) {
+            throw new IllegalArgumentException("appKey should be 16 bytes long");
+        }
+        return new LorawanDevice(_appEui, _devEui, _appId, _devId, null, null, null, _appKey, 0, 0, false, true, "otaa", 0);
+    }
+
+    public static LorawanDevice createABP(String _appId, String _devId, byte[] _appEui, byte[] _devEui, byte[] _devAddr, byte[] _nwkSKey, byte[] _appSKey, boolean _disableFCntCheck, boolean _uses32BitFCnt) {
+        if (_appEui.length != 8) {
+            throw new IllegalArgumentException("appEui should be 8 bytes long");
+        }
+        if (_devEui.length != 8) {
+            throw new IllegalArgumentException("devEui should be 8 bytes long");
+        }
+        if (_devAddr.length != 4) {
+            throw new IllegalArgumentException("devAddr should be 4 bytes long");
+        }
+        if (_nwkSKey.length != 16) {
+            throw new IllegalArgumentException("nwkSKey should be 16 bytes long");
+        }
+        if (_appSKey.length != 16) {
+            throw new IllegalArgumentException("appSKey should be 16 bytes long");
+        }
+        return new LorawanDevice(_appEui, _devEui, _appId, _devId, _devAddr, _nwkSKey, _appSKey, null, 0, 0, _disableFCntCheck, _uses32BitFCnt, "abp", 0);
     }
 
     public static Observable<LorawanDevice> from(DeviceOuterClass.Device _proto) {

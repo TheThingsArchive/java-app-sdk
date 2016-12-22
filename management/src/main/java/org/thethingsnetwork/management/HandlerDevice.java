@@ -36,9 +36,9 @@ public class HandlerDevice {
 
     private final String appId;
     private final String devId;
-    private LorawanDevice lorawan;
+    private final LorawanDevice lorawan;
 
-    private HandlerDevice(String _appId, String _devId, LorawanDevice _lorawan) {
+    public HandlerDevice(String _appId, String _devId, LorawanDevice _lorawan) {
         appId = _appId;
         devId = _devId;
         lorawan = _lorawan;

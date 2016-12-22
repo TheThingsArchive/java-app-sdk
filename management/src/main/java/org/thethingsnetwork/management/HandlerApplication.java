@@ -33,30 +33,10 @@ import rx.Subscriber;
  */
 public class HandlerApplication {
 
-    private String appId;
+    private final String appId;
     private String decoder;
     private String converter;
     private String validator;
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public String getDecoder() {
-        return decoder;
-    }
-
-    public String getConverter() {
-        return converter;
-    }
-
-    public String getValidator() {
-        return validator;
-    }
-
-    public String getEncoder() {
-        return encoder;
-    }
     private String encoder;
 
     private HandlerApplication(String _appId, String _decoder, String _converter, String _validator, String _encoder) {
@@ -106,5 +86,41 @@ public class HandlerApplication {
                     }
                 });
 
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public String getDecoder() {
+        return decoder;
+    }
+
+    public String getConverter() {
+        return converter;
+    }
+
+    public String getValidator() {
+        return validator;
+    }
+
+    public String getEncoder() {
+        return encoder;
+    }
+
+    public void setDecoder(String _decoder) {
+        decoder = _decoder;
+    }
+
+    public void setConverter(String _converter) {
+        converter = _converter;
+    }
+
+    public void setValidator(String _validator) {
+        validator = _validator;
+    }
+
+    public void setEncoder(String _encoder) {
+        encoder = _encoder;
     }
 }
