@@ -40,8 +40,8 @@ import rx.schedulers.Schedulers;
  */
 public class AsyncDiscovery {
 
-    private static final String HOST = "discovery.thethingsnetwork.org";
-    private static final int PORT = 1900;
+    public static final String HOST = "discovery.thethingsnetwork.org";
+    public static final int PORT = 1900;
 
     private final DiscoveryGrpc.DiscoveryFutureStub stub;
 
