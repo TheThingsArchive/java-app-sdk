@@ -24,13 +24,7 @@
 package org.thethingsnetwork.account.async.auth.token;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import okhttp3.HttpUrl;
-import okhttp3.RequestBody;
-import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
-import rx.Subscriber;
 
 /**
  *
@@ -94,56 +88,9 @@ public class AsyncJsonWebToken implements AsyncOAuth2Token {
         return accountServer;
     }
 
-    public Observable<? extends AsyncJsonWebToken> restrict(List<String> _claims) {
-        return Observable
-                .create((Subscriber<? super HttpUrl> t) -> {
-                    try {
-                        t.onNext(new HttpUrl.Builder()
-                                .host(accountServer.getHost())
-                                .scheme(accountServer.getScheme())
-                                .port(accountServer.getPort() == -1 ? (accountServer.getScheme().equals("http") ? 80 : 443) : accountServer.getPort())
-                                .addPathSegments("users/restrict-token")
-                                .build()
-                        );
-                        t.onCompleted();
-                    } catch (Exception ex) {
-                        t.onError(ex);
-                    }
-                })
-                .flatMap(HttpRequest::from)
-                .flatMap((HttpRequest t) -> t.inject(this))
-                .flatMap((HttpRequest t) -> HttpRequest
-                        .buildRequestBody(new RestrictRequest(_claims))
-                        .map((RequestBody rb) -> {
-                            t.getBuilder().post(rb);
-                            return t;
-                        })
-                )
-                .flatMap((HttpRequest t) -> t.doExecuteForType(RestrictResponse.class))
-                .map((RestrictResponse t) -> new AsyncJsonWebToken(t.accessToken, expiration, accountServer));
-    }
-
-    public Observable<? extends AsyncJsonWebToken> restrict(String... _claims) {
-        return restrict(Arrays.asList(_claims));
-    }
-
     @Override
     public String getRawToken() {
         return token;
-    }
-
-    private class RestrictRequest {
-
-        public List<String> scope;
-
-        public RestrictRequest(List<String> _scope) {
-            scope = _scope;
-        }
-    }
-
-    private static class RestrictResponse {
-
-        public String accessToken;
     }
 
 }

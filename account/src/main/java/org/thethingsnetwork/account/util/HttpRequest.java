@@ -195,6 +195,10 @@ public class HttpRequest {
                 );
 
     }
+    
+    public static void shutdown(){
+        client.dispatcher().executorService().shutdown();
+    }
 
     public Request.Builder getBuilder() {
         return builder;

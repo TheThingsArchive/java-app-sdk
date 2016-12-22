@@ -33,14 +33,37 @@ import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public interface AbstractApplication {
 
+    /**
+     * Get the application ID
+     *
+     * @return the application ID
+     */
     public String getId();
 
+    /**
+     * Get the application name
+     *
+     * @return the application name
+     */
     public String getName();
 
+    /**
+     * Get the application creation time
+     *
+     * @return the application creation time
+     */
     public String getCreated();
 
+    /**
+     * Update the application name
+     * @param _name the new name to be set
+     */
     public void setName(String _name);
-    
+
+    /**
+     * Update the AsyncOAuth2Token to be used by this application wrapper
+     * @param _creds the new AsyncOAuth2Token to be used
+     */
     public void updateCredentials(AsyncOAuth2Token _creds);
 
 }

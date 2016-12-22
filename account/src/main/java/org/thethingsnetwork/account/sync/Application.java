@@ -24,17 +24,17 @@
 package org.thethingsnetwork.account.sync;
 
 import java.util.List;
+import org.thethingsnetwork.account.async.AsyncApplication;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.account.common.AccessKey;
 import org.thethingsnetwork.account.common.Collaborator;
-import org.thethingsnetwork.account.async.AsyncApplication;
-import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 
 /**
  *
  * @author Romain Cambier
  */
-public class Application implements AbstractApplication{
+public class Application implements AbstractApplication {
 
     private final AsyncApplication wrapped;
 
@@ -95,14 +95,16 @@ public class Application implements AbstractApplication{
                 .single();
     }
 
-    public String addEUI(String _eui) {
+    public Application addEUI(String _eui) {
         return wrapped.addEUI(_eui)
+                .map((i) -> this)
                 .toBlocking()
                 .single();
     }
 
-    public String deleteEUI(String _eui) {
+    public Application deleteEUI(String _eui) {
         return wrapped.deleteEUI(_eui)
+                .map((i) -> this)
                 .toBlocking()
                 .single();
     }
@@ -120,14 +122,16 @@ public class Application implements AbstractApplication{
                 .singleOrDefault(null);
     }
 
-    public Collaborator addCollaborator(Collaborator _collaborator) {
+    public Application addCollaborator(Collaborator _collaborator) {
         return wrapped.addCollaborator(_collaborator)
+                .map((i) -> this)
                 .toBlocking()
                 .single();
     }
 
-    public Collaborator removeCollaborator(Collaborator _collaborator) {
+    public Application removeCollaborator(Collaborator _collaborator) {
         return wrapped.removeCollaborator(_collaborator)
+                .map((i) -> this)
                 .toBlocking()
                 .single();
     }
@@ -151,8 +155,9 @@ public class Application implements AbstractApplication{
                 .single();
     }
 
-    public AccessKey removeAccessKey(AccessKey _key) {
+    public Application removeAccessKey(AccessKey _key) {
         return wrapped.removeAccessKey(_key)
+                .map((i) -> this)
                 .toBlocking()
                 .single();
     }

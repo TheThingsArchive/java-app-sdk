@@ -26,15 +26,18 @@ package org.thethingsnetwork.account.async;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.account.common.AccessKey;
 import org.thethingsnetwork.account.common.Collaborator;
+import org.thethingsnetwork.account.sync.Application;
 import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
-import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 
 /**
+ * This class is an async wrapper for an TTN application.
  *
+ * @see Application for a sync version
  * @author Romain Cambier
  */
 public class AsyncApplication implements AbstractApplication {
@@ -48,6 +51,12 @@ public class AsyncApplication implements AbstractApplication {
     private AsyncApplication() {
     }
 
+    /**
+     * Create a new application
+     *
+     * @param _id the new application ID
+     * @param _name the new application name
+     */
     public AsyncApplication(String _id, String _name) {
         id = _id;
         name = _name;
@@ -85,6 +94,12 @@ public class AsyncApplication implements AbstractApplication {
         creds = _other.creds;
     }
 
+    /**
+     * List all applications available with this token
+     *
+     * @param _creds the AsyncOAuth2Token to be used for authentication
+     * @return the list of AsyncApplication as an Observable stream
+     */
     public static Observable<AsyncApplication> findAll(AsyncOAuth2Token _creds) {
         /**
          * GET /applications
@@ -98,6 +113,13 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((AsyncApplication app) -> app.updateCredentials(_creds));
     }
 
+    /**
+     * Create an application
+     *
+     * @param _creds the AsyncOAuth2Token to be used for authentication
+     * @param _app the AsyncApplication template
+     * @return the new AsyncApplication as an Observable stream.
+     */
     public static Observable<AsyncApplication> create(AsyncOAuth2Token _creds, AbstractApplication _app) {
         /**
          * POST /applications
@@ -116,6 +138,13 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((AsyncApplication ap) -> ap.updateCredentials(_creds));
     }
 
+    /**
+     * Fetch an application
+     *
+     * @param _creds the AsyncOAuth2Token to be used for authentication
+     * @param _id the application ID to fetch
+     * @return the AsyncApplication as an Observable stream.
+     */
     public static Observable<AsyncApplication> findOne(AsyncOAuth2Token _creds, String _id) {
         /**
          * GET /applications/{app_id}
@@ -128,16 +157,34 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((AsyncApplication app) -> app.updateCredentials(_creds));
     }
 
+    /**
+     * Update this application
+     *
+     * @return the updated AsyncApplication as an Observable stream.
+     */
     public Observable<AsyncApplication> save() {
         /**
          * PATCH /applications/{app_id}
          */
-        /**
-         * @todo: implement
-         */
-        return Observable.error(new UnsupportedOperationException("Not supported yet."));
+        return HttpRequest
+                .from(creds.getAccountServer() + "/applications/" + id)
+                .flatMap((HttpRequest t) -> t.inject(creds))
+                .flatMap((HttpRequest t) -> HttpRequest
+                        .buildRequestBody(this)
+                        .map((RequestBody rb) -> {
+                            t.getBuilder().patch(rb);
+                            return t;
+                        })
+                )
+                .flatMap((HttpRequest t) -> t.doExecute())
+                .map((i) -> this);
     }
 
+    /**
+     * Delete this application
+     *
+     * @return the updated AsyncApplication as an Observable stream.
+     */
     public Observable<AsyncApplication> delete() {
         /**
          * DELETE /applications/{app_id}
@@ -150,6 +197,11 @@ public class AsyncApplication implements AbstractApplication {
                 .map((Response r) -> this);
     }
 
+    /**
+     * List all EUIs of this application
+     *
+     * @return the EUIs of this AsyncApplication as an Observable stream.
+     */
     public Observable<String> findAllEUIs() {
         /**
          * GET /applications/{app_id}/euis
@@ -162,6 +214,11 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap(Observable::from);
     }
 
+    /**
+     * Create a random EUI on this application
+     *
+     * @return the new EUI as an Observable stream.
+     */
     public Observable<String> createEUI() {
         /**
          * POST /applications/{app_id}/euis
@@ -174,7 +231,13 @@ public class AsyncApplication implements AbstractApplication {
                 .map((EuiCreationResponse t) -> t.eui);
     }
 
-    public Observable<String> addEUI(String _eui) {
+    /**
+     * Create a defined EUI on this application
+     *
+     * @param _eui the new EUI
+     * the updated AsyncApplication as an Observable stream.
+     */
+    public Observable<AsyncApplication> addEUI(String _eui) {
         /**
          * PUT /applications/{app_id}/euis/{eui}
          */
@@ -183,10 +246,16 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().put(RequestBody.create(null, new byte[0])))
                 .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response r) -> _eui);
+                .map((Response r) -> this);
     }
 
-    public Observable<String> deleteEUI(String _eui) {
+    /**
+     * Delete an EUI from this application
+     *
+     * @param _eui the EUI to be deleted
+     * @return the updated AsyncApplication as an Observable stream.
+     */
+    public Observable<AsyncApplication> deleteEUI(String _eui) {
         /**
          * DELETE /applications/{app_id}/euis/{eui}
          */
@@ -195,9 +264,14 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().delete())
                 .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response r) -> _eui);
+                .map((Response r) -> this);
     }
 
+    /**
+     * List all collaborators of this application
+     *
+     * @return the list of Collaborator of this AsyncApplication as an Observable stream.
+     */
     public Observable<Collaborator> getCollaborators() {
         /**
          * GET /applications/{app_id}/collaborators
@@ -210,6 +284,12 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((Collaborator[] cs) -> Observable.from(cs));
     }
 
+    /**
+     * Fetch one collaborator from this application
+     *
+     * @param _username the username of the Collaborator
+     * @return the Collaborator as an Observable stream.
+     */
     public Observable<Collaborator> findOneCollaborator(String _username) {
         /**
          * GET /applications/{app_id}/collaborators/{username}
@@ -221,7 +301,13 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.doExecuteForType(Collaborator.class));
     }
 
-    public Observable<Collaborator> addCollaborator(Collaborator _collaborator) {
+    /**
+     * Add a collaborator to this application
+     *
+     * @param _collaborator the Collaborator to be added
+     * @return the updated AsyncApplication as an Observable stream.
+     */
+    public Observable<AsyncApplication> addCollaborator(Collaborator _collaborator) {
         /**
          * PUT /applications/{app_id}/collaborators/{username}
          */
@@ -236,10 +322,16 @@ public class AsyncApplication implements AbstractApplication {
                         })
                 )
                 .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response c) -> _collaborator);
+                .map((Response c) -> this);
     }
 
-    public Observable<Collaborator> removeCollaborator(Collaborator _collaborator) {
+    /**
+     * Remove a collaborator from this application
+     *
+     * @param _collaborator the Collaborator to be removed
+     * @return the updated AsyncApplication as an Observable stream.
+     */
+    public Observable<AsyncApplication> removeCollaborator(Collaborator _collaborator) {
         /**
          * DELETE /applications/{app_id}/euis/{eui}
          */
@@ -248,9 +340,14 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().delete())
                 .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response c) -> _collaborator);
+                .map((Response c) -> this);
     }
 
+    /**
+     * List all access-keys of this application
+     *
+     * @return the list of AccessKey of this AsyncApplication as an Observable stream.
+     */
     public Observable<AccessKey> getAccessKeys() {
         /**
          * GET /applications/{app_id}/access-keys
@@ -263,6 +360,12 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((AccessKey[] cs) -> Observable.from(cs));
     }
 
+    /**
+     * Fetch one access-key of this application
+     *
+     * @param _keyname the name of the AccessKey
+     * @return the AccessKey as an Observable stream.
+     */
     public Observable<AccessKey> findOneAccessKey(String _keyname) {
         /**
          * GET /applications/{app_id}/access-keys/{keyname}
@@ -274,6 +377,12 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey.class));
     }
 
+    /**
+     * Add an access-key to this application
+     *
+     * @param _key the AccessKey template
+     * @return the new AccessKey as an Observable stream.
+     */
     public Observable<AccessKey> addAccessKey(AccessKey _key) {
         /**
          * POST /applications/{app_id}/access-keys/{username}
@@ -288,11 +397,17 @@ public class AsyncApplication implements AbstractApplication {
                             return t;
                         })
                 )
-                .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response c) -> _key);
+                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey.class))
+                .map((AccessKey c) -> c);
     }
 
-    public Observable<AccessKey> removeAccessKey(AccessKey _key) {
+    /**
+     * Remove an access-key from this application
+     *
+     * @param _key the AccessKey
+     * @return the updated AsyncApplication as an Observable stream.
+     */
+    public Observable<AsyncApplication> removeAccessKey(AccessKey _key) {
         /**
          * DELETE /applications/{app_id}/access-keys/{keyname}
          */
@@ -301,19 +416,35 @@ public class AsyncApplication implements AbstractApplication {
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().delete())
                 .flatMap((HttpRequest t) -> t.doExecute())
-                .map((Response c) -> _key);
+                .map((Response c) -> this);
     }
 
+    /**
+     * Refresh this local application
+     *
+     * @return the updated AsyncApplication as an Observable stream.
+     */
     public Observable<AsyncApplication> refresh() {
         return findOne(creds, getId())
                 .doOnNext((AsyncApplication t) -> refresh(t))
                 .map((AsyncApplication app) -> this);
     }
 
+    /**
+     * List all rights of this application and token
+     *
+     * @return the list of rights (String) of this AsyncApplication as an Observable stream.
+     */
     public Observable<String> getRights() {
         return getRights(creds);
     }
 
+    /**
+     * List all rights of the provided token on this application
+     *
+     * @param _creds the AsyncOAuth2Token to check right of
+     * @return the list of rights (String) of this AsyncApplication as an Observable stream.
+     */
     public Observable<String> getRights(AsyncOAuth2Token _creds) {
         /**
          * GET /applications/{app_id}/rights
@@ -324,6 +455,11 @@ public class AsyncApplication implements AbstractApplication {
                 .doOnNext((HttpRequest t) -> t.getBuilder().get())
                 .flatMap((HttpRequest t) -> t.doExecuteForType(String[].class))
                 .flatMap(Observable::from);
+    }
+
+    @Override
+    public String toString() {
+        return "Application \"" + name + "\" (" + id + ")";
     }
 
     private static class EuiCreationResponse {

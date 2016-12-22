@@ -25,8 +25,12 @@ package org.thethingsnetwork.account.async.auth.token;
 
 import java.util.Arrays;
 import java.util.List;
+import okhttp3.HttpUrl;
+import okhttp3.RequestBody;
 import org.thethingsnetwork.account.async.auth.grant.AsyncAuthorizationCode;
+import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
+import rx.Subscriber;
 
 /**
  *
@@ -67,11 +71,34 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
         return provider.refreshToken(this);
     }
 
-    @Override
     public Observable<? extends AsyncJsonWebToken> restrict(List<String> _claims) {
         AsyncRenewableJsonWebToken that = this;
-        return super.restrict(_claims)
-                .map((AsyncJsonWebToken t) -> new AsyncRenewableJsonWebToken(t.getRawToken(), t.getExpiration(), "", provider) {
+        return Observable
+                .create((Subscriber<? super HttpUrl> t) -> {
+                    try {
+                        t.onNext(new HttpUrl.Builder()
+                                .host(getAccountServer().getHost())
+                                .scheme(getAccountServer().getScheme())
+                                .port(getAccountServer().getPort() == -1 ? (getAccountServer().getScheme().equals("http") ? 80 : 443) : getAccountServer().getPort())
+                                .addPathSegments("users/restrict-token")
+                                .build()
+                        );
+                        t.onCompleted();
+                    } catch (Exception ex) {
+                        t.onError(ex);
+                    }
+                })
+                .flatMap(HttpRequest::from)
+                .flatMap((HttpRequest t) -> t.inject(this))
+                .flatMap((HttpRequest t) -> HttpRequest
+                        .buildRequestBody(new RestrictRequest(_claims))
+                        .map((RequestBody rb) -> {
+                            t.getBuilder().post(rb);
+                            return t;
+                        })
+                )
+                .flatMap((HttpRequest t) -> t.doExecuteForType(RestrictResponse.class))
+                .map((RestrictResponse t) -> new AsyncRenewableJsonWebToken(t.accessToken, getExpiration(), "", provider) {
 
                     @Override
                     public Observable<AsyncRenewableJsonWebToken> refresh() {
@@ -88,7 +115,6 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
                 });
     }
 
-    @Override
     public Observable<? extends AsyncJsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
@@ -98,5 +124,19 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
         setToken(_accessToken);
         setExpiration(_expiration);
         return this;
+    }
+
+    private class RestrictRequest {
+
+        public List<String> scope;
+
+        public RestrictRequest(List<String> _scope) {
+            scope = _scope;
+        }
+    }
+
+    private static class RestrictResponse {
+
+        public String accessToken;
     }
 }
