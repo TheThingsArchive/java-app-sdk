@@ -34,8 +34,6 @@ import rx.Subscriber;
  */
 public class LorawanDevice {
 
-    private static final String[] validActivationConstraints = new String[]{"otaa", "abp", "world", "local", "private", "testing"};
-
     private byte[] appEui;
     private byte[] devEui;
     private final String appId;
@@ -49,7 +47,7 @@ public class LorawanDevice {
     private boolean disableFCntCheck;
     private boolean uses32BitFCnt;
     private String activationConstraints;
-    private long lastSeen;
+    private final long lastSeen;
 
     private LorawanDevice(byte[] _appEui, byte[] _devEui, String _appId, String _devId, byte[] _devAddr, byte[] _nwkSKey, byte[] _appSKey, byte[] _appKey, int _fCntUp, int _fCntDown, boolean _disableFCntCheck, boolean _uses32BitFCnt, String _activationConstraints, long _lastSeen) {
         appEui = _appEui;
@@ -261,17 +259,19 @@ public class LorawanDevice {
     }
 
     public void setActivationConstraints(String _activationConstraints) {
-        for (String vac : validActivationConstraints) {
-            if (vac.equals(_activationConstraints)) {
-                activationConstraints = _activationConstraints;
-                return;
-            }
-        }
-        throw new IllegalArgumentException(_activationConstraints + " is not a valid activation constraint");
+        activationConstraints = _activationConstraints;
     }
 
     public long getLastSeen() {
         return lastSeen;
+    }
+
+    public void resetFCntUp() {
+        fCntUp = 0;
+    }
+
+    public void resetFCntDown() {
+        fCntDown = 0;
     }
 
 }
