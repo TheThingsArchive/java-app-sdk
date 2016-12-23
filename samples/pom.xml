@@ -11,6 +11,7 @@
     <modules>
         <module>samples-mqtt</module>
         <module>samples-account</module>
+        <module>samples-amqp</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
