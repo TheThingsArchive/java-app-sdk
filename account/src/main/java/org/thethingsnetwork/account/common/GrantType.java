@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.auth.grant;
+package org.thethingsnetwork.account.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;

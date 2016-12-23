@@ -28,7 +28,7 @@ import java.util.Base64;
 import okhttp3.HttpUrl;
 import okhttp3.RequestBody;
 import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
-import org.thethingsnetwork.account.auth.grant.GrantType;
+import org.thethingsnetwork.account.common.GrantType;
 import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
 import rx.Subscriber;

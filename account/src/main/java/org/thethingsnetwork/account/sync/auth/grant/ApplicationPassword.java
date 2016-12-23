@@ -26,7 +26,7 @@ package org.thethingsnetwork.account.sync.auth.grant;
 import java.net.URI;
 import org.thethingsnetwork.account.async.auth.grant.AsyncApplicationPassword;
 import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
-import org.thethingsnetwork.account.auth.grant.GrantType;
+import org.thethingsnetwork.account.common.GrantType;
 import org.thethingsnetwork.account.sync.auth.token.JsonWebToken;
 
 /**

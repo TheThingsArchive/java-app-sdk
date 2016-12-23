@@ -27,7 +27,7 @@ import java.net.URI;
 import okhttp3.HttpUrl;
 import org.thethingsnetwork.account.async.auth.grant.AsyncAuthorizationCode;
 import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
-import org.thethingsnetwork.account.auth.grant.GrantType;
+import org.thethingsnetwork.account.common.GrantType;
 import org.thethingsnetwork.account.sync.auth.token.RenewableJsonWebToken;
 
 /**

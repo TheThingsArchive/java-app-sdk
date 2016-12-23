@@ -10,9 +10,9 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>mqtt</module>
-        <module>amqp</module>
-        <module>common</module>
+        <module>data-mqtt</module>
+        <module>data-amqp</module>
+        <module>data-common</module>
     </modules>
     
     <name>The Things Network Data SDK</name>
