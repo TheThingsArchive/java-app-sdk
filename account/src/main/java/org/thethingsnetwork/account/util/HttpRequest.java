@@ -154,6 +154,21 @@ public class HttpRequest {
                             client.newCall(r).enqueue(new SubscriberCallback(t));
                         })
                         .subscribeOn(Schedulers.io())
+                )
+                .flatMap((Response r) -> Observable
+                        .create((Subscriber<? super Response> t) -> {
+                            try {
+                                if (!r.isSuccessful()) {
+                                    t.onError(new HttpException(r.code(), r.message(), new String(r.body().bytes())));
+                                    return;
+                                }
+                                t.onNext(r);
+                                t.onCompleted();
+                            } catch (IOException ex) {
+                                t.onError(ex);
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
                 );
 
     }
@@ -195,8 +210,8 @@ public class HttpRequest {
                 );
 
     }
-    
-    public static void shutdown(){
+
+    public static void shutdown() {
         client.dispatcher().executorService().shutdown();
     }
 

@@ -23,21 +23,19 @@
  */
 package org.thethingsnetwork.samples.account;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.List;
 import org.thethingsnetwork.account.common.AccessKey;
 import org.thethingsnetwork.account.sync.Application;
-import org.thethingsnetwork.account.sync.auth.grant.AuthorizationCode;
-import org.thethingsnetwork.account.sync.auth.token.RenewableJsonWebToken;
+import org.thethingsnetwork.account.sync.auth.grant.ApplicationPassword;
+import org.thethingsnetwork.account.sync.auth.token.JsonWebToken;
 
 /**
  *
  * @author Romain Cambier
  */
-public class AuthorizationCodeSync {
+public class ApplicationPasswordSync {
 
-    public static void run(App.Config _conf) throws Exception {
+    public static void run(App.Config _conf) {
         if (_conf.cliendId == null) {
             throw new NullPointerException("missing cliendId");
         }
@@ -46,38 +44,23 @@ public class AuthorizationCodeSync {
             throw new NullPointerException("missing clientSecret");
         }
 
-        if (_conf.redirect == null) {
-            throw new NullPointerException("missing redirect");
+        if (_conf.applicationId == null) {
+            throw new NullPointerException("missing applicationId");
         }
 
-        AuthorizationCode tokenProvider = new AuthorizationCode(_conf.cliendId, _conf.clientSecret);
-
-        String redirect = tokenProvider.buildAuthorizationURL(_conf.redirect).toString();
-
-        System.out.println("here is the authorization url: " + redirect);
-        System.out.print("Enter code: ");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String code = br.readLine();
-
-        if (code == null || code.equals("")) {
-            throw new IllegalArgumentException("invalid code");
+        if (_conf.applicationKey == null) {
+            throw new NullPointerException("missing applicationKey");
         }
 
-        RenewableJsonWebToken token = tokenProvider.getToken(code);
+        ApplicationPassword tokenProvider = new ApplicationPassword(_conf.applicationId, _conf.applicationKey, _conf.cliendId, _conf.clientSecret);
 
-        List<Application> apps = Application.findAll(token);
+        JsonWebToken token = tokenProvider.getToken();
 
-        for (Application app : apps) {
+        Application app = Application.findOne(token, _conf.applicationId);
 
-            RenewableJsonWebToken restrictedToken = token.restrict("apps:" + app.getId());
+        List<AccessKey> accessKeys = app.getAccessKeys();
 
-            app.updateCredentials(restrictedToken);
-
-            List<AccessKey> accessKeys = app.getAccessKeys();
-
-            System.out.println("\tapplication " + app.getName() + " has " + accessKeys.size() + " keys");
-
-        }
+        System.out.println("\tapplication " + app.getName() + " has " + accessKeys.size() + " keys");
     }
 
 }

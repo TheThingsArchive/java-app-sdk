@@ -45,9 +45,9 @@ public class App {
         System.out.println("Starting AuthorizationCodeSync");
         AuthorizationCodeSync.run(cfg);
         System.out.println("Starting ApplicationPasswordAsync");
-        //ApplicationPasswordAsync.run(cfg);
+        ApplicationPasswordAsync.run(cfg);
         System.out.println("Starting ApplicationPasswordSync");
-        //ApplicationPasswordSync.run(cfg);
+        ApplicationPasswordSync.run(cfg);
         
         HttpRequest.shutdown();
 

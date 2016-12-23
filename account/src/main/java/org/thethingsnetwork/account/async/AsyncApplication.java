@@ -318,7 +318,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
                 .flatMap((HttpRequest t) -> HttpRequest
                         .buildRequestBody(_collaborator)
                         .map((RequestBody rb) -> {
-                            t.getBuilder().post(rb);
+                            t.getBuilder().put(rb);
                             return t;
                         })
                 )

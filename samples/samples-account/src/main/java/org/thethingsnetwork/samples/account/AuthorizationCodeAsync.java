@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import org.thethingsnetwork.account.async.AsyncApplication;
 import org.thethingsnetwork.account.async.auth.grant.AsyncAuthorizationCode;
 import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
-import org.thethingsnetwork.account.common.Collaborator;
+import org.thethingsnetwork.account.common.AccessKey;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -90,17 +90,17 @@ public class AuthorizationCodeAsync {
                                                         application.updateCredentials(restrictedToken);
                                                     }
                                                 })
-                                                .flatMap(new Func1<AsyncRenewableJsonWebToken, Observable<Collaborator>>() {
+                                                .flatMap(new Func1<AsyncRenewableJsonWebToken, Observable<AccessKey>>() {
                                                     @Override
-                                                    public Observable<Collaborator> call(AsyncRenewableJsonWebToken restrictedToken) {
-                                                        return application.getCollaborators();
+                                                    public Observable<AccessKey> call(AsyncRenewableJsonWebToken restrictedToken) {
+                                                        return application.getAccessKeys();
                                                     }
                                                 })
                                                 .count()
                                                 .map(new Func1<Integer, String>() {
                                                     @Override
-                                                    public String call(Integer collabCount) {
-                                                        return "\tapplication " + application.getName() + " has " + collabCount + " collaborators";
+                                                    public String call(Integer accessKeysCount) {
+                                                        return "\tapplication " + application.getName() + " has " + accessKeysCount + " keys";
                                                     }
                                                 });
                                     }
@@ -142,9 +142,9 @@ public class AuthorizationCodeAsync {
                         .flatMap((AsyncApplication application) -> token
                                 .restrict("apps:" + application.getId())
                                 .doOnNext(application::updateCredentials)
-                                .flatMap((ignore) -> application.getCollaborators())
+                                .flatMap((ignore) -> application.getAccessKeys())
                                 .count()
-                                .map((Integer collabCount) -> "\tapplication " + application.getName() + " has " + collabCount + " collaborators")
+                                .map((Integer accessKeysCount) -> "\tapplication " + application.getName() + " has " + accessKeysCount + " keys")
                         )
                 )
                 .doOnNext(System.out::println)

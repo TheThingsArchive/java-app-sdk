@@ -25,7 +25,6 @@ package org.thethingsnetwork.account.sync;
 
 import java.util.List;
 import org.thethingsnetwork.account.async.AsyncApplication;
-import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.account.common.AccessKey;
 import org.thethingsnetwork.account.common.ApplicationRights;
@@ -63,8 +62,8 @@ public class Application implements AbstractApplication<OAuth2Token> {
                 .single();
     }
 
-    public static Application findOne(AsyncOAuth2Token _creds, String _id) {
-        return AsyncApplication.findOne(_creds, _id)
+    public static Application findOne(OAuth2Token _creds, String _id) {
+        return AsyncApplication.findOne(_creds.async(), _id)
                 .map((AsyncApplication t) -> new Application(t))
                 .toBlocking()
                 .singleOrDefault(null);
@@ -178,8 +177,8 @@ public class Application implements AbstractApplication<OAuth2Token> {
                 .single();
     }
 
-    public List<ApplicationRights> getRights(AsyncOAuth2Token _creds) {
-        return wrapped.getRights(_creds)
+    public List<ApplicationRights> getRights(OAuth2Token _creds) {
+        return wrapped.getRights(_creds.async())
                 .toList()
                 .toBlocking()
                 .single();
