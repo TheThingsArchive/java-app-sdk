@@ -28,13 +28,15 @@ import org.thethingsnetwork.account.async.AsyncApplication;
 import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ApplicationRights;
 import org.thethingsnetwork.account.common.Collaborator;
+import org.thethingsnetwork.account.sync.auth.token.OAuth2Token;
 
 /**
  *
  * @author Romain Cambier
  */
-public class Application implements AbstractApplication {
+public class Application implements AbstractApplication<OAuth2Token> {
 
     private final AsyncApplication wrapped;
 
@@ -46,16 +48,16 @@ public class Application implements AbstractApplication {
         wrapped = _wrap;
     }
 
-    public static List<Application> findAll(AsyncOAuth2Token _creds) {
-        return AsyncApplication.findAll(_creds)
+    public static List<Application> findAll(OAuth2Token _creds) {
+        return AsyncApplication.findAll(_creds.async())
                 .map((AsyncApplication t) -> new Application(t))
                 .toList()
                 .toBlocking()
                 .single();
     }
 
-    public static Application create(AsyncOAuth2Token _creds, AbstractApplication _app) {
-        return AsyncApplication.create(_creds, _app)
+    public static Application create(OAuth2Token _creds, AbstractApplication _app) {
+        return AsyncApplication.create(_creds.async(), _app)
                 .map((AsyncApplication t) -> new Application(t))
                 .toBlocking()
                 .single();
@@ -169,14 +171,14 @@ public class Application implements AbstractApplication {
                 .single();
     }
 
-    public List<String> getRights() {
+    public List<ApplicationRights> getRights() {
         return wrapped.getRights()
                 .toList()
                 .toBlocking()
                 .single();
     }
 
-    public List<String> getRights(AsyncOAuth2Token _creds) {
+    public List<ApplicationRights> getRights(AsyncOAuth2Token _creds) {
         return wrapped.getRights(_creds)
                 .toList()
                 .toBlocking()
@@ -204,8 +206,8 @@ public class Application implements AbstractApplication {
     }
 
     @Override
-    public void updateCredentials(AsyncOAuth2Token _creds) {
-        wrapped.updateCredentials(_creds);
+    public void updateCredentials(OAuth2Token _creds) {
+        wrapped.updateCredentials(_creds.async());
     }
 
 }

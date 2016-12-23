@@ -71,7 +71,7 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
         return provider.refreshToken(this);
     }
 
-    public Observable<? extends AsyncJsonWebToken> restrict(List<String> _claims) {
+    public Observable<AsyncRenewableJsonWebToken> restrict(List<String> _claims) {
         AsyncRenewableJsonWebToken that = this;
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {
@@ -115,7 +115,7 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
                 });
     }
 
-    public Observable<? extends AsyncJsonWebToken> restrict(String... _claims) {
+    public Observable<AsyncRenewableJsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 

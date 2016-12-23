@@ -29,6 +29,7 @@ import okhttp3.Response;
 import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
 import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ApplicationRights;
 import org.thethingsnetwork.account.common.Collaborator;
 import org.thethingsnetwork.account.sync.Application;
 import org.thethingsnetwork.account.util.HttpRequest;
@@ -40,7 +41,7 @@ import rx.Observable;
  * @see Application for a sync version
  * @author Romain Cambier
  */
-public class AsyncApplication implements AbstractApplication {
+public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
 
     private String id;
     private String name;
@@ -235,7 +236,7 @@ public class AsyncApplication implements AbstractApplication {
      * Create a defined EUI on this application
      *
      * @param _eui the new EUI
-     * the updated AsyncApplication as an Observable stream.
+     * @return the updated AsyncApplication as an Observable stream.
      */
     public Observable<AsyncApplication> addEUI(String _eui) {
         /**
@@ -385,7 +386,7 @@ public class AsyncApplication implements AbstractApplication {
      */
     public Observable<AccessKey> addAccessKey(AccessKey _key) {
         /**
-         * POST /applications/{app_id}/access-keys/{username}
+         * POST /applications/{app_id}/access-keys
          */
         return HttpRequest
                 .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys")
@@ -433,9 +434,9 @@ public class AsyncApplication implements AbstractApplication {
     /**
      * List all rights of this application and token
      *
-     * @return the list of rights (String) of this AsyncApplication as an Observable stream.
+     * @return the list of ApplicationRights of this AsyncApplication as an Observable stream.
      */
-    public Observable<String> getRights() {
+    public Observable<ApplicationRights> getRights() {
         return getRights(creds);
     }
 
@@ -443,9 +444,9 @@ public class AsyncApplication implements AbstractApplication {
      * List all rights of the provided token on this application
      *
      * @param _creds the AsyncOAuth2Token to check right of
-     * @return the list of rights (String) of this AsyncApplication as an Observable stream.
+     * @return the list of ApplicationRights of this AsyncApplication as an Observable stream.
      */
-    public Observable<String> getRights(AsyncOAuth2Token _creds) {
+    public Observable<ApplicationRights> getRights(AsyncOAuth2Token _creds) {
         /**
          * GET /applications/{app_id}/rights
          */
@@ -453,7 +454,7 @@ public class AsyncApplication implements AbstractApplication {
                 .from(creds.getAccountServer() + "/applications/" + getId() + "/rights")
                 .flatMap((HttpRequest t) -> t.inject(_creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().get())
-                .flatMap((HttpRequest t) -> t.doExecuteForType(String[].class))
+                .flatMap((HttpRequest t) -> t.doExecuteForType(ApplicationRights[].class))
                 .flatMap(Observable::from);
     }
 

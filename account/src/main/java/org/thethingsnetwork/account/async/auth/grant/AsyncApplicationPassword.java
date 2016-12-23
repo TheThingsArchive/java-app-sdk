@@ -27,13 +27,14 @@ import java.net.URI;
 import java.util.Base64;
 import okhttp3.HttpUrl;
 import okhttp3.RequestBody;
-import org.thethingsnetwork.account.auth.grant.GrantType;
 import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
+import org.thethingsnetwork.account.auth.grant.GrantType;
 import org.thethingsnetwork.account.util.HttpRequest;
 import rx.Observable;
 import rx.Subscriber;
 
 /**
+ * This token provider uses application credentials (id + access-key) to generate a token only usable for the owning application
  *
  * @author Romain Cambier
  */
@@ -45,6 +46,15 @@ public class AsyncApplicationPassword extends GrantType {
     private final String key;
     private final URI accountServer;
 
+    /**
+     * Create an instance of this token provider using fully-customized settings
+     *
+     * @param _appId The application id
+     * @param _key The application access-key
+     * @param _clientId The client id you received from the account server
+     * @param _clientSecret The client secret you received from the account server
+     * @param _accountServer The account server to be used
+     */
     public AsyncApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret, URI _accountServer) {
         if (_key == null) {
             throw new IllegalArgumentException("key can not be null");
@@ -68,6 +78,14 @@ public class AsyncApplicationPassword extends GrantType {
         clientSecret = _clientSecret;
     }
 
+    /**
+     * Create an instance of this token provider using default account server
+     *
+     * @param _appId The application id
+     * @param _key The application access-key
+     * @param _clientId The client id you received from the account server
+     * @param _clientSecret The client secret you received from the account server
+     */
     public AsyncApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret) {
         this(_appId, _key, _clientId, _clientSecret, GrantType.DEFAULT_ACCOUNT_SERVER);
     }
@@ -81,6 +99,11 @@ public class AsyncApplicationPassword extends GrantType {
         return "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
     }
 
+    /**
+     * Create a token using the settings provided in the constructor
+     *
+     * @return the AsyncJsonWebToken as an Observable stream
+     */
     public Observable<AsyncJsonWebToken> getToken() {
         return Observable
                 .create((Subscriber<? super HttpUrl> t) -> {

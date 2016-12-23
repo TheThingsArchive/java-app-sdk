@@ -9,7 +9,8 @@
     <name>The Things Network SDK Samples</name>
     <description>The Things Network SDK Samples</description>
     <modules>
-        <module>mqtt</module>
+        <module>samples-mqtt</module>
+        <module>samples-account</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

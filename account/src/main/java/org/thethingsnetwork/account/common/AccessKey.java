@@ -36,13 +36,13 @@ public class AccessKey {
 
     private String name;
     private String key;
-    private List<String> rights;
+    private List<ApplicationRights> rights;
 
     public AccessKey() {
 
     }
 
-    public AccessKey(String _name, List<String> _rights) {
+    public AccessKey(String _name, List<ApplicationRights> _rights) {
         name = _name;
         rights = _rights;
     }
@@ -55,7 +55,7 @@ public class AccessKey {
         return key;
     }
 
-    public List<String> getRights() {
+    public List<ApplicationRights> getRights() {
         return Collections.unmodifiableList(rights);
     }
 }

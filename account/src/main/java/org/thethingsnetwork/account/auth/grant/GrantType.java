@@ -42,6 +42,10 @@ public abstract class GrantType {
         }
     }
     
+    /**
+     * Get the account server used by this token provider
+     * @return The account server URI
+     */
     public abstract URI getAccountServer();
 
 }

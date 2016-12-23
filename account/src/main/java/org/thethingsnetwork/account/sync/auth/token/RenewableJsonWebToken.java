@@ -26,7 +26,6 @@ package org.thethingsnetwork.account.sync.auth.token;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
 import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
 
 /**
@@ -75,14 +74,14 @@ public class RenewableJsonWebToken implements OAuth2Token {
         return wrapped.getAccountServer();
     }
 
-    public JsonWebToken restrict(List<String> _claims) {
+    public RenewableJsonWebToken restrict(List<String> _claims) {
         return wrapped.restrict(_claims)
-                .map((AsyncJsonWebToken t) -> new JsonWebToken(t))
+                .map((AsyncRenewableJsonWebToken t) -> new RenewableJsonWebToken(t))
                 .toBlocking()
                 .single();
     }
 
-    public JsonWebToken restrict(String... _claims) {
+    public RenewableJsonWebToken restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 

@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>account</module>
         <module>data</module>
         <module>management</module>
+        <module>account</module>
     </modules>
     
     <name>The Things Network Java SDK</name>

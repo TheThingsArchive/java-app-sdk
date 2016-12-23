@@ -23,46 +23,31 @@
  */
 package org.thethingsnetwork.account.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  *
  * @author Romain Cambier
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public interface AbstractApplication<T> {
+public enum ApplicationRights {
 
-    /**
-     * Get the application ID
-     *
-     * @return the application ID
-     */
-    public String getId();
+    SETTINGS("settings"),
+    DELETE("delete"),
+    COLLABORATORS("collaborators"),
+    MESSAGE_UP_R("messages:up:r"),
+    MESSAGE_UP_W("messages:up:w"),
+    MESSAGE_DOWN_W("messages:down:w"),
+    DEVICES("devices");
 
-    /**
-     * Get the application name
-     *
-     * @return the application name
-     */
-    public String getName();
+    private final String serialized;
 
-    /**
-     * Get the application creation time
-     *
-     * @return the application creation time
-     */
-    public String getCreated();
+    private ApplicationRights(String _serialized) {
+        serialized = _serialized;
+    }
 
-    /**
-     * Update the application name
-     * @param _name the new name to be set
-     */
-    public void setName(String _name);
-
-    /**
-     * Update the AsyncOAuth2Token to be used by this application wrapper
-     * @param _creds the new AsyncOAuth2Token to be used
-     */
-    public <R extends T> void updateCredentials(R _creds);
+    @JsonValue
+    public String toJson() {
+        return serialized;
+    }
 
 }
