@@ -45,22 +45,45 @@ public class UplinkMessage implements DataMessage {
 
     }
 
+    /**
+     * Get the encryption port
+     *
+     * @return the encryption port
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Get the uplink frame counter
+     *
+     * @return the uplink frame counter
+     */
     public int getCounter() {
         return counter;
     }
 
+    /**
+     * Get the raw payload
+     *
+     * @return the raw payload as a byte array
+     */
     public byte[] getPayloadRaw() {
         return Base64.getDecoder().decode(payloadRaw);
     }
 
+    /**
+     * Get the payload fields. Only if you have a decoder function
+     * @return the payload fields as a Map where keys are strings, and values are any json-valid entity
+     */
     public Map<String, Object> getPayloadFields() {
         return Collections.unmodifiableMap(payloadFields);
     }
 
+    /**
+     * Get the metadata of this uplink packet
+     * @return the metadata
+     */
     public Metadata getMetadata() {
         return metadata;
     }

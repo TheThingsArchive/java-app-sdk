@@ -26,6 +26,7 @@ package org.thethingsnetwork.data.common.events;
 import org.thethingsnetwork.data.common.Subscribable;
 
 /**
+ * Handler protoype for client errors
  *
  * @author Romain Cambier
  */

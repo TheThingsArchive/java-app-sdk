@@ -27,25 +27,56 @@ import java.io.IOException;
 import org.thethingsnetwork.data.common.AbstractClient;
 
 /**
+ * Wrapper for a filtered message payload (ex: only one field of the decoded json)
  *
  * @author Romain Cambier
  */
 public abstract class RawMessage implements DataMessage {
 
+    /**
+     * Get the payload as a String
+     *
+     * @return the payload as a String
+     */
     public abstract String asString();
 
+    /**
+     * Get the payload as an Integer
+     *
+     * @return the payload as an Integer
+     */
     public int asInt() {
         return Integer.parseInt(asString());
     }
 
+    /**
+     * Get the payload as a Double
+     *
+     * @return the payload as a Double
+     */
     public double asDouble() {
         return Double.parseDouble(asString());
     }
 
+    /**
+     * Get the payload as a Boolean
+     *
+     * @return the payload as a Boolean
+     */
     public boolean asBoolean() {
         return Boolean.parseBoolean(asString());
     }
 
+    /**
+     * Get the payload as a custom Object
+     * The custom object can be a default one as Boolean, Integer, Double, or String.
+     * In case it's something different, jackson will be used to parse the payload
+     *
+     * @param <T> a Boolean, Integer, Double, String, or the custom user-provided class
+     * @param _class the type of object to deserialize the payload to.
+     * @return the payload as a custom Object
+     * @throws java.io.IOException in case the deserialization could not be done
+     */
     public <T> T as(Class<T> _class) throws IOException {
         if (_class == null) {
             throw new NullPointerException();

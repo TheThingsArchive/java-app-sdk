@@ -23,11 +23,11 @@
  */
 package org.thethingsnetwork.data.common.events;
 
-import org.thethingsnetwork.data.common.messages.ActivationMessage;
 import org.thethingsnetwork.data.common.Subscribable;
+import org.thethingsnetwork.data.common.messages.ActivationMessage;
 
 /**
- *
+ * Handler protoype for device activations
  * @author Romain Cambier
  */
 public abstract class ActivationHandler implements EventHandler {

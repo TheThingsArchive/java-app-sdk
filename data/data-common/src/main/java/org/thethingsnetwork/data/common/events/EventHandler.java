@@ -26,11 +26,11 @@ package org.thethingsnetwork.data.common.events;
 import org.thethingsnetwork.data.common.Subscribable;
 
 /**
- *
+ * @internal
  * @author Romain Cambier
  */
 public interface EventHandler {
-    
+
     public void subscribe(Subscribable _client) throws Exception;
-    
+
 }

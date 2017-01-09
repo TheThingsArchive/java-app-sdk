@@ -29,6 +29,10 @@ package org.thethingsnetwork.data.common;
  */
 public interface Connection {
 
+    /**
+     * Return the underlying Connection Object
+     * @return the underlying Connection
+     */
     public Object get();
     
 }

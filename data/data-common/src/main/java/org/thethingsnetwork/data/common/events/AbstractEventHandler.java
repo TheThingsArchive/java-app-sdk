@@ -27,6 +27,7 @@ import org.thethingsnetwork.data.common.Subscribable;
 import org.thethingsnetwork.data.common.messages.RawMessage;
 
 /**
+ * Handler protoype for raw device events
  *
  * @author Romain Cambier
  */

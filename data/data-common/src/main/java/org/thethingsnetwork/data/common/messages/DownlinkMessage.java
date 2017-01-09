@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 /**
+ * Wrapper for a downlink message
  *
  * @author Romain Cambier
  */
@@ -39,16 +40,34 @@ public class DownlinkMessage {
     private String payloadRaw;
     private Object payloadFields;
 
+    /**
+     * Constructor for a base64-encoded payload
+     *
+     * @param _port the port to be used while encrypting the message
+     * @param _payload the actual base64 string
+     */
     public DownlinkMessage(int _port, String _payload) {
         port = _port;
         payloadRaw = _payload;
     }
 
+    /**
+     * Constructor for a byte array
+     *
+     * @param _port the port to be used while encrypting the message
+     * @param _payload the actual data
+     */
     public DownlinkMessage(int _port, byte[] _payload) {
         port = _port;
         payloadRaw = Base64.getEncoder().encodeToString(_payload);
     }
 
+    /**
+     * Constructor for a byte buffer
+     *
+     * @param _port the port to be used while encrypting the message
+     * @param _payload the actual data
+     */
     public DownlinkMessage(int _port, ByteBuffer _payload) {
         port = _port;
         _payload.rewind();
@@ -57,6 +76,12 @@ public class DownlinkMessage {
         payloadRaw = Base64.getEncoder().encodeToString(payload);
     }
 
+    /**
+     * Constructor for any kind of java object that will be json-serialized by jackson
+     *
+     * @param _port the port to be used while encrypting the message
+     * @param _payload the actual object
+     */
     public DownlinkMessage(int _port, Object _payload) {
         port = _port;
         payloadFields = _payload;

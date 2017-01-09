@@ -44,30 +44,64 @@ public class Metadata {
 
     }
 
+    /**
+     * Get the RX (uplink) or TX (downlink) time of this packet
+     *
+     * @return the time as a String
+     */
     public String getTime() {
         return time;
     }
 
+    /**
+     * Get the  frequency of this packet
+     *
+     * @return the frequency, in MHz
+     */
     public double getFrequency() {
         return frequency;
     }
 
+    /**
+     * Get the Modulation of this packet
+     *
+     * @return the modulation
+     */
     public String getModulation() {
         return modulation;
     }
 
+    /**
+     * Get the data rate of this packet
+     *
+     * @return the data rate
+     */
     public String getDataRate() {
         return dataRate;
     }
 
+    /**
+     * Get the bit rate of this packet
+     *
+     * @return the bit rate
+     */
     public String getBitRate() {
         return bitRate;
     }
 
+    /**
+     * Get the coding rate of this packet
+     *
+     * @return the coding rate
+     */
     public String getCodingRate() {
         return codingRate;
     }
 
+    /**
+     * Get the list of gateways that received this packet
+     * @return a List of Gateway
+     */
     public List<Gateway> getGateways() {
         if (gateways == null) {
             return null;
@@ -75,6 +109,7 @@ public class Metadata {
         return Collections.unmodifiableList(gateways);
     }
 
+    
     public static class Gateway {
 
         private String id;
@@ -89,30 +124,58 @@ public class Metadata {
 
         }
 
+        /**
+         * Get the Gateway ID as registered in TheThingsNetwork
+         * @return the gateway id
+         */
         public String getId() {
             return id;
         }
 
+        /**
+         * Get the Gateway internal reception time
+         * @return the gateway internal reception time
+         */
         public long getTimestamp() {
             return timestamp;
         }
 
+        /**
+         * Get the Gateway absolute reception time
+         * @return the gateway absolute reception time
+         */
         public String getTime() {
             return time;
         }
 
+        /**
+         * Get the channel this packet was sent on
+         * @return the channel this packet was sent on
+         */
         public int getChannel() {
             return channel;
         }
 
+        /**
+         * Get the RX rssi of this packet
+         * @return the RX rssi of this packet
+         */
         public double getRssi() {
             return rssi;
         }
 
+        /**
+         * Get the RX snr of this packet
+         * @return the RX snr of this packet
+         */
         public double getSnr() {
             return snr;
         }
 
+        /**
+         * Get the RF chain of this packet
+         * @return the RF chain of this packet
+         */
         public int getRfChain() {
             return rfChain;
         }

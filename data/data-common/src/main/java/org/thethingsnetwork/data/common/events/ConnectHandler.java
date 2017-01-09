@@ -27,6 +27,7 @@ import org.thethingsnetwork.data.common.Connection;
 import org.thethingsnetwork.data.common.Subscribable;
 
 /**
+ * Handler protoype for dclient connection
  *
  * @author Romain Cambier
  */

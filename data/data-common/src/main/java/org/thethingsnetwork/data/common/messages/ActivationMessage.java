@@ -26,6 +26,7 @@ package org.thethingsnetwork.data.common.messages;
 import org.thethingsnetwork.data.common.Metadata;
 
 /**
+ * This is a wrapper for activation messages
  *
  * @author Romain Cambier
  */
@@ -35,26 +36,45 @@ public class ActivationMessage {
     private String devEui;
     private String devAddr;
     private Metadata metadata;
-    
-    private ActivationMessage(){
-        
+
+    private ActivationMessage() {
+
     }
 
+    /**
+     * Get the LoraWan Application EUI
+     *
+     * @returnthe LoraWan Application EUI
+     */
     public String getAppEui() {
         return appEui;
     }
 
+    /**
+     * Get the LoraWan Device EUI
+     *
+     * @return the LoraWan Device EUI
+     */
     public String getDevEui() {
         return devEui;
     }
 
+    /**
+     * Get the LoraWan Device address
+     *
+     * @return the LoraWan Device address
+     */
     public String getDevAddr() {
         return devAddr;
     }
 
+    /**
+     * Get the metadata of this uplink packet
+     *
+     * @return the metadata
+     */
     public Metadata getMetadata() {
         return metadata;
     }
-    
-    
+
 }

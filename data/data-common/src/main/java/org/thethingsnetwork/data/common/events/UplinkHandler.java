@@ -27,6 +27,7 @@ import org.thethingsnetwork.data.common.Subscribable;
 import org.thethingsnetwork.data.common.messages.DataMessage;
 
 /**
+ * Handler protoype for device uplink messages
  *
  * @author Romain Cambier
  */

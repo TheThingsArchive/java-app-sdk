@@ -24,7 +24,7 @@
 package org.thethingsnetwork.data.common.messages;
 
 /**
- *
+ * Wrapper for any sort of uplink message
  * @author Romain Cambier
  */
 public interface DataMessage {
