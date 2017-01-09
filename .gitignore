@@ -25,3 +25,5 @@
 /samples/account/target/
 /samples/samples-account/target/
 /data/data-common/target/
+/samples/ttnmgmt/target/
+/samples/samples-management/target/
