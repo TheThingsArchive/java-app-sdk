@@ -57,14 +57,14 @@ public abstract class UplinkHandler implements EventHandler {
     @Override
     public void subscribe(Subscribable _client) throws Exception {
         if (getField() == null) {
-            _client.subscibe(new String[]{
+            _client.subscribe(new String[]{
                 _client.getWordWildcard(),
                 _client.getWordWildcard(),
                 (getDevId() == null) ? _client.getWordWildcard() : getDevId(),
                 "up"
             });
         } else {
-            _client.subscibe(new String[]{
+            _client.subscribe(new String[]{
                 _client.getWordWildcard(),
                 _client.getWordWildcard(),
                 (getDevId() == null) ? _client.getWordWildcard() : getDevId(),

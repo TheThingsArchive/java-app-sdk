@@ -252,7 +252,7 @@ public class Client extends AbstractClient {
                     private static final String WILDCARD_PATH = "#";
 
                     @Override
-                    public void subscibe(String[] _key) throws Exception {
+                    public void subscribe(String[] _key) throws Exception {
                         StringJoiner sj = new StringJoiner(".");
                         for (String key : _key) {
                             sj.add(key);
