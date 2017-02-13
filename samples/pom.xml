@@ -3,13 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.thethingsnetwork</groupId>
     <artifactId>samples</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <packaging>pom</packaging>
     
     <name>The Things Network SDK Samples</name>
     <description>The Things Network SDK Samples</description>
     <modules>
-        <module>mqtt</module>
+        <module>samples-mqtt</module>
+        <module>samples-account</module>
+        <module>samples-amqp</module>
+        <module>samples-management</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

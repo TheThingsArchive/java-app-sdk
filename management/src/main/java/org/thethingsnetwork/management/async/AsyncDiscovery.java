@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2016 The Things Network
+ * Copyright (c) 2017 The Things Network
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ package org.thethingsnetwork.management.async;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.ByteArrayInputStream;
-import org.thethingsnetwork.account.auth.token.OAuth2Token;
+import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.management.proto.DiscoveryGrpc;
 import org.thethingsnetwork.management.proto.DiscoveryOuterClass;
 import org.thethingsnetwork.management.proto.DiscoveryOuterClass.GetRequest;
@@ -35,13 +35,20 @@ import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
 /**
+ * This class is an async wrapper for the The Things Network discovery service
  *
  * @author Romain Cambier
  */
 public class AsyncDiscovery {
 
-    private static final String HOST = "discovery.thethingsnetwork.org";
-    private static final int PORT = 1900;
+    /**
+     * Main The Things Network discovery server host
+     */
+    public static final String HOST = "discovery.thethingsnetwork.org";
+    /**
+     * Main The Things Network discovery server port
+     */
+    public static final int PORT = 1900;
 
     private final DiscoveryGrpc.DiscoveryFutureStub stub;
 
@@ -49,6 +56,13 @@ public class AsyncDiscovery {
         stub = _stub;
     }
 
+    /**
+     * Build an AsyncDiscovery wrapper from Host and Port
+     *
+     * @param _host The server host
+     * @param _port The server port
+     * @return An Observable stream containing the newly built AsyncDiscovery wrapper
+     */
     public static Observable<AsyncDiscovery> from(String _host, int _port) {
         return Observable
                 .create((Subscriber<? super AsyncDiscovery> t) -> {
@@ -66,24 +80,42 @@ public class AsyncDiscovery {
                 });
     }
 
+    /**
+     * Build an AsyncDiscovery wrapper using default servers
+     *
+     * @return An Observable stream containing the newly built AsyncDiscovery wrapper
+     */
     public static Observable<AsyncDiscovery> getDefault() {
         return from(HOST, PORT);
     }
 
-    public Observable<AsyncHandler> getHandler(OAuth2Token _creds, String _handlerId) {
+    /**
+     * Fetch discovery service for the specified handler
+     *
+     * @param _creds A valid authentication token
+     * @param _handlerId The handler id
+     * @return An Observable stream containing the AsyncHandler wrapper
+     */
+    public Observable<AsyncHandler> getHandler(AsyncOAuth2Token _creds, String _handlerId) {
         return Observable
                 .from(stub.get(GetRequest.newBuilder().setId(_handlerId).setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
                 .flatMap((DiscoveryOuterClass.Announcement t) -> from(_creds, t));
     }
 
-    public Observable<AsyncHandler> getHandlers(OAuth2Token _creds) {
+    /**
+     * Fetch discovery service for all handlers
+     *
+     * @param _creds A valid authentication token
+     * @return An Observable stream containing the AsyncHandler wrappers
+     */
+    public Observable<AsyncHandler> getHandlers(AsyncOAuth2Token _creds) {
         return Observable
                 .from(stub.getAll(DiscoveryOuterClass.GetServiceRequest.newBuilder().setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
                 .flatMap((DiscoveryOuterClass.AnnouncementsResponse t) -> Observable.from(t.getServicesList()))
                 .flatMap((DiscoveryOuterClass.Announcement t) -> from(_creds, t));
     }
 
-    private Observable<AsyncHandler> from(OAuth2Token _creds, DiscoveryOuterClass.Announcement _announcement) {
+    private Observable<AsyncHandler> from(AsyncOAuth2Token _creds, DiscoveryOuterClass.Announcement _announcement) {
         return Observable.from(_announcement.getNetAddress().split(","))
                 .flatMap((String tt) -> Observable
                         .create((Subscriber<? super Server> t) -> {
@@ -114,9 +146,21 @@ public class AsyncDiscovery {
 
     }
 
+    /**
+     * List of known The Things Network services
+     */
     public static enum Services {
+        /**
+         * Handler Service. Responsible of device management
+         */
         HANDLER,
+        /**
+         * Broker Service. Responsible of data deduplication and Handler routing
+         */
         BROKER,
+        /**
+         * Router Service. Responsible of global routing
+         */
         ROUTER
     }
 }

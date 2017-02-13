@@ -6,9 +6,9 @@ This is the Java SDK for [The Things Network](https://www.thethingsnetwork.org) 
 
 ## Modules
 
-- **[WIP]** [Account](account) - Interact with The Things Network account server
-- **[WIP]** [Management](management) - Interact with The Things Network Handler via the API
-- **[WIP]** [Data AMQP](data/amqp) - Subscribe to Things Network Handler to send/receive data via AMQP
+- [Account](account) - Interact with The Things Network account server
+- [Management](management) - Interact with The Things Network Handler via the API
+- [Data AMQP](data/amqp) - Subscribe to Things Network Handler to send/receive data via AMQP
 - [Data MQTT](data/mqtt) - Subscribe to Things Network Handler to send/receive data via MQTT
 - [Samples](samples) - Samples of how to use previous libraries
 
