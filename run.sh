@@ -6,7 +6,7 @@ if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH = "master" ]]; the
     && cd samples \
     && mvn clean package \
     && cd ../ \
-    && mvn clean package install javadoc:aggregate javadoc:jar source:jar-no-fork deploy --settings settings.xml -DperformRelease=true \
+    && mvn clean javadoc:aggregate javadoc:jar source:jar-no-fork deploy --settings settings.xml -DperformRelease=true \
     && rm -rf out \
     && mkdir out \
     && cd out \
@@ -19,7 +19,7 @@ if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH = "master" ]]; the
     && git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:gh-pages
     exit $?
 else
-    mvn clean package javadoc:aggregate javadoc:jar source:jar-no-fork \
+    mvn clean javadoc:jar source:jar-no-fork \
     && cd samples \
     && mvn clean package
     exit $?
