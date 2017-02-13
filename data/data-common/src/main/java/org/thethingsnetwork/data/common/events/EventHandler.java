@@ -26,7 +26,6 @@ package org.thethingsnetwork.data.common.events;
 import org.thethingsnetwork.data.common.Subscribable;
 
 /**
- * @internal
  * @author Romain Cambier
  */
 public interface EventHandler {

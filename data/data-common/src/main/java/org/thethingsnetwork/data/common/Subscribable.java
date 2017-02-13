@@ -24,7 +24,6 @@
 package org.thethingsnetwork.data.common;
 
 /**
- * @internal
  * @author Romain Cambier
  */
 public interface Subscribable {

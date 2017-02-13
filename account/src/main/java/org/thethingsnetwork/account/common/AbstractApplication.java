@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  *
  * @author Romain Cambier
+ * @param <T> internal
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public interface AbstractApplication<T> {
@@ -61,6 +62,7 @@ public interface AbstractApplication<T> {
 
     /**
      * Update the AsyncOAuth2Token to be used by this application wrapper
+     * @param <R> internal
      * @param _creds the new AsyncOAuth2Token to be used
      */
     public <R extends T> void updateCredentials(R _creds);

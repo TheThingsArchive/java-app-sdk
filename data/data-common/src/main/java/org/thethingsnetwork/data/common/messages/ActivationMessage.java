@@ -44,7 +44,7 @@ public class ActivationMessage {
     /**
      * Get the LoraWan Application EUI
      *
-     * @returnthe LoraWan Application EUI
+     * @return the LoraWan Application EUI
      */
     public String getAppEui() {
         return appEui;
