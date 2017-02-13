@@ -28,7 +28,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
- *
+ * This class is a representation of a The Things Network application
  * @author Romain Cambier
  */
 public class HandlerApplication {
@@ -47,6 +47,12 @@ public class HandlerApplication {
         encoder = _encoder;
     }
 
+    /**
+     * Build a HandlerApplication instance from a grpc representation
+     *
+     * @param _proto The grpc representation
+     * @return An Observable HandlerApplication containing the HandlerApplication instance
+     */
     public static Observable<HandlerApplication> from(HandlerOuterClass.Application _proto) {
 
         return Observable
@@ -67,6 +73,11 @@ public class HandlerApplication {
 
     }
 
+    /**
+     * Convert this HandlerApplication instance to the grpc representation
+     *
+     * @return The grpc representation
+     */
     public Observable<HandlerOuterClass.Application> toProto() {
 
         return Observable
@@ -88,38 +99,83 @@ public class HandlerApplication {
 
     }
 
+    /**
+     * Get the application id
+     *
+     * @return The application id
+     */
     public String getAppId() {
         return appId;
     }
 
+    /**
+     * Get the application decoder function
+     *
+     * @return The applicationn decoder function
+     */
     public String getDecoder() {
         return decoder;
     }
 
+    /**
+     * Get the application converter function
+     *
+     * @return The applicationn converter function
+     */
     public String getConverter() {
         return converter;
     }
 
+    /**
+     * Get the application validator function
+     *
+     * @return The applicationn validator function
+     */
     public String getValidator() {
         return validator;
     }
 
+    /**
+     * Get the application encoder function
+     *
+     * @return The applicationn encoder function
+     */
     public String getEncoder() {
         return encoder;
     }
 
+    /**
+     * Set the application decoder function
+     *
+     * @param _decoder The applicationn decoder function
+     */
     public void setDecoder(String _decoder) {
         decoder = _decoder;
     }
 
+    /**
+     * Set the application converter function
+     *
+     * @param _converter The converter function
+     */
     public void setConverter(String _converter) {
         converter = _converter;
     }
 
+    /**
+     * Set the application validator function
+     *
+     * @param _validator The validator function
+     */
     public void setValidator(String _validator) {
         validator = _validator;
     }
 
+    /**
+     * Set the application encoder function
+     *
+     * @param _encoder The encoder function
+     */
     public void setEncoder(String _encoder) {
         encoder = _encoder;
     }

@@ -29,7 +29,7 @@ import org.thethingsnetwork.management.async.AsyncDiscovery;
 import org.thethingsnetwork.management.async.AsyncHandler;
 
 /**
- *
+ * This class is a wrapper for the The Things Network discovery service
  * @author Romain Cambier
  */
 public class Discovery {
@@ -40,6 +40,13 @@ public class Discovery {
         wrapped = _wrap;
     }
 
+    /**
+     * Build a Discovery wrapper from Host and Port
+     *
+     * @param _host The server host
+     * @param _port The server port
+     * @return The newly built Discovery wrapper
+     */
     public static Discovery from(String _host, int _port) {
         return AsyncDiscovery.from(_host, _port)
                 .map((AsyncDiscovery t) -> new Discovery(t))
@@ -47,10 +54,22 @@ public class Discovery {
                 .single();
     }
 
+    /**
+     * Build a Discovery wrapper using default servers
+     *
+     * @return The newly built Discovery wrapper
+     */
     public static Discovery getDefault() {
         return from(AsyncDiscovery.HOST, AsyncDiscovery.PORT);
     }
 
+    /**
+     * Fetch discovery service for the specified handler
+     *
+     * @param _creds A valid authentication token
+     * @param _handlerId The handler id
+     * @return The requested Handler
+     */
     public Handler getHandler(OAuth2Token _creds, String _handlerId) {
         return wrapped.getHandler(_creds.async(), _handlerId)
                 .map((AsyncHandler t) -> new Handler(t))
@@ -58,6 +77,12 @@ public class Discovery {
                 .single();
     }
 
+    /**
+     * Fetch discovery service for all handlers
+     *
+     * @param _creds A valid authentication token
+     * @return A list of the Handler wrappers
+     */
     public List<Handler> getHandlers(OAuth2Token _creds) {
         return wrapped.getHandlers(_creds.async())
                 .map((AsyncHandler t) -> new Handler(t))

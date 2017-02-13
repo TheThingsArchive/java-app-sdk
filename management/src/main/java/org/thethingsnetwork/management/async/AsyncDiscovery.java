@@ -35,12 +35,19 @@ import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
 /**
+ * This class is an async wrapper for the The Things Network discovery service
  *
  * @author Romain Cambier
  */
 public class AsyncDiscovery {
 
+    /**
+     * Main The Things Network discovery server host
+     */
     public static final String HOST = "discovery.thethingsnetwork.org";
+    /**
+     * Main The Things Network discovery server port
+     */
     public static final int PORT = 1900;
 
     private final DiscoveryGrpc.DiscoveryFutureStub stub;
@@ -49,6 +56,13 @@ public class AsyncDiscovery {
         stub = _stub;
     }
 
+    /**
+     * Build an AsyncDiscovery wrapper from Host and Port
+     *
+     * @param _host The server host
+     * @param _port The server port
+     * @return An Observable stream containing the newly built AsyncDiscovery wrapper
+     */
     public static Observable<AsyncDiscovery> from(String _host, int _port) {
         return Observable
                 .create((Subscriber<? super AsyncDiscovery> t) -> {
@@ -66,16 +80,34 @@ public class AsyncDiscovery {
                 });
     }
 
+    /**
+     * Build an AsyncDiscovery wrapper using default servers
+     *
+     * @return An Observable stream containing the newly built AsyncDiscovery wrapper
+     */
     public static Observable<AsyncDiscovery> getDefault() {
         return from(HOST, PORT);
     }
 
+    /**
+     * Fetch discovery service for the specified handler
+     *
+     * @param _creds A valid authentication token
+     * @param _handlerId The handler id
+     * @return An Observable stream containing the AsyncHandler wrapper
+     */
     public Observable<AsyncHandler> getHandler(AsyncOAuth2Token _creds, String _handlerId) {
         return Observable
                 .from(stub.get(GetRequest.newBuilder().setId(_handlerId).setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
                 .flatMap((DiscoveryOuterClass.Announcement t) -> from(_creds, t));
     }
 
+    /**
+     * Fetch discovery service for all handlers
+     *
+     * @param _creds A valid authentication token
+     * @return An Observable stream containing the AsyncHandler wrappers
+     */
     public Observable<AsyncHandler> getHandlers(AsyncOAuth2Token _creds) {
         return Observable
                 .from(stub.getAll(DiscoveryOuterClass.GetServiceRequest.newBuilder().setServiceName(Services.HANDLER.name().toLowerCase()).build()), Schedulers.io())
@@ -114,9 +146,21 @@ public class AsyncDiscovery {
 
     }
 
+    /**
+     * List of known The Things Network services
+     */
     public static enum Services {
+        /**
+         * Handler Service. Responsible of device management
+         */
         HANDLER,
+        /**
+         * Broker Service. Responsible of data deduplication and Handler routing
+         */
         BROKER,
+        /**
+         * Router Service. Responsible of global routing
+         */
         ROUTER
     }
 }

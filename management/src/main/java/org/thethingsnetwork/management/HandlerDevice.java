@@ -29,6 +29,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
+ * This class is a representation of a The Things Network device
  *
  * @author Romain Cambier
  */
@@ -38,20 +39,42 @@ public class HandlerDevice {
     private final String devId;
     private final LorawanDevice lorawan;
 
+    /**
+     * Build a device from application id, device id, and lorawan data
+     *
+     * @param _appId The application id
+     * @param _devId The device id
+     * @param _lorawan The LoraWan data
+     */
     public HandlerDevice(String _appId, String _devId, LorawanDevice _lorawan) {
         appId = _appId;
         devId = _devId;
         lorawan = _lorawan;
     }
 
+    /**
+     * Get the application id
+     *
+     * @return The application id
+     */
     public String getAppId() {
         return appId;
     }
 
+    /**
+     * Get the device id
+     *
+     * @return The device id
+     */
     public String getDevId() {
         return devId;
     }
 
+    /**
+     * Get the LoraWan data
+     *
+     * @return the LoraWan data
+     */
     public LorawanDevice getLorawan() {
         return lorawan;
     }
@@ -76,6 +99,11 @@ public class HandlerDevice {
 
     }
 
+    /**
+     * Convert this device to the grpc representation
+     *
+     * @return The grpc representation
+     */
     public Observable<HandlerOuterClass.Device> toProto() {
 
         return lorawan.toProto()

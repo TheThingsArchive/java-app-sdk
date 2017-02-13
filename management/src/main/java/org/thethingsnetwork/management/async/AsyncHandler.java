@@ -45,6 +45,7 @@ import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
 /**
+ * This class is an async wrapper for the The Things Network handler service
  *
  * @author Romain Cambier
  */
@@ -56,6 +57,15 @@ public class AsyncHandler {
         stub = _stub;
     }
 
+    /**
+     * Build an AsyncHandler instance
+     *
+     * @param _credentials A valid authentication token
+     * @param _host The handler host
+     * @param _port The handler port
+     * @param _certificate The handler certificate
+     * @return An Observable stream containing the newly built AsyncHandler wrapper
+     */
     public static Observable<AsyncHandler> from(AsyncOAuth2Token _credentials, String _host, int _port, InputStream _certificate) {
 
         return Observable
@@ -98,6 +108,12 @@ public class AsyncHandler {
 
     }
 
+    /**
+     * Register an application to The Things Network
+     *
+     * @param _application the application to register
+     * @return An Observable stream containing the newly registered HandlerApplication
+     */
     public Observable<HandlerApplication> registerApplication(AbstractApplication _application) {
         return Observable
                 .from(stub.registerApplication(
@@ -109,11 +125,23 @@ public class AsyncHandler {
                 .flatMap((ignore) -> getApplication(_application.getId()));
     }
 
+    /**
+     * Get an application from the handler service
+     *
+     * @param _applicationId The id of the application
+     * @return An Observable stream containing the requested HandlerApplication
+     */
     public Observable<HandlerApplication> getApplication(String _applicationId) {
         return Observable.from(stub.getApplication(HandlerOuterClass.ApplicationIdentifier.newBuilder().setAppId(_applicationId).build()), Schedulers.io())
                 .flatMap(HandlerApplication::from);
     }
 
+    /**
+     * Update (or create) an application on the handler service
+     *
+     * @param _application The application (new or updated)
+     * @return An Observable stream containing the updated HandlerApplication
+     */
     public Observable<HandlerApplication> setApplication(HandlerApplication _application) {
         return _application
                 .toProto()
@@ -121,6 +149,12 @@ public class AsyncHandler {
                 .map((ignore) -> _application);
     }
 
+    /**
+     * Delete an application from the handler service
+     *
+     * @param _application The application
+     * @return An Observable stream containing the deleted HandlerApplication
+     */
     public Observable<HandlerApplication> deleteApplication(HandlerApplication _application) {
         return Observable
                 .from(stub.deleteApplication(
@@ -132,6 +166,12 @@ public class AsyncHandler {
                 .map((ignore) -> _application);
     }
 
+    /**
+     * Get all devices from the handler service
+     *
+     * @param _application The application to list devices of
+     * @return An Observable stream containing the HandlerDevice objects
+     */
     public Observable<HandlerDevice> getDevices(HandlerApplication _application) {
         return Observable
                 .from(stub.getDevicesForApplication(
@@ -144,6 +184,13 @@ public class AsyncHandler {
                 .flatMap((HandlerOuterClass.Device t) -> HandlerDevice.from(t));
     }
 
+    /**
+     * Get a device from the handler service
+     *
+     * @param _application The application containing the device
+     * @param _deviceId The device id
+     * @return An Observable stream containing the HandlerDevice
+     */
     public Observable<HandlerDevice> getDevice(HandlerApplication _application, String _deviceId) {
         return Observable
                 .from(stub.getDevice(
@@ -156,6 +203,12 @@ public class AsyncHandler {
                 .flatMap((HandlerOuterClass.Device t) -> HandlerDevice.from(t));
     }
 
+    /**
+     * Update (or create) a device on the handler service
+     *
+     * @param _device The device
+     * @return An Observable stream containing the updated HandlerDevice
+     */
     public Observable<HandlerDevice> setDevice(HandlerDevice _device) {
         return _device.toProto()
                 .flatMap((HandlerOuterClass.Device tt) -> Observable
@@ -164,6 +217,12 @@ public class AsyncHandler {
 
     }
 
+    /**
+     * Delete a device on the handler service
+     *
+     * @param _device The device
+     * @return An Observable stream containing the deleted HandlerDevice
+     */
     public Observable<HandlerDevice> deleteDevice(HandlerDevice _device) {
         return Observable
                 .from(stub.deleteDevice(

@@ -32,6 +32,7 @@ import org.thethingsnetwork.management.HandlerDevice;
 import org.thethingsnetwork.management.async.AsyncHandler;
 
 /**
+ * This class is a wrapper for the The Things Network handler service
  *
  * @author Romain Cambier
  */
@@ -43,6 +44,15 @@ public class Handler {
         wrapped = _wrap;
     }
 
+    /**
+     * Build a Handler wrapper instance
+     *
+     * @param _credentials A valid authentication token
+     * @param _host The handler host
+     * @param _port The handler port
+     * @param _certificate The handler certificate
+     * @return The newly built Handler
+     */
     public static Handler from(OAuth2Token _credentials, String _host, int _port, InputStream _certificate) {
         return AsyncHandler.from(_credentials.async(), _host, _port, _certificate)
                 .map((AsyncHandler t) -> new Handler(t))
@@ -50,30 +60,60 @@ public class Handler {
                 .single();
     }
 
+    /**
+     * Register an application to The Things Network
+     *
+     * @param _application the application to register
+     * @return The newly registered HandlerApplication
+     */
     public HandlerApplication registerApplication(AbstractApplication _application) {
         return wrapped.registerApplication(_application)
                 .toBlocking()
                 .single();
     }
 
+    /**
+     * Get an application from the handler service
+     *
+     * @param _applicationId The id of the application
+     * @return The requested HandlerApplication
+     */
     public HandlerApplication getApplication(String _applicationId) {
         return wrapped.getApplication(_applicationId)
                 .toBlocking()
                 .single();
     }
 
+    /**
+     * Update (or create) an application on the handler service
+     *
+     * @param _application The application (new or updated)
+     * @return The updated HandlerApplication
+     */
     public HandlerApplication setApplication(HandlerApplication _application) {
         return wrapped.setApplication(_application)
                 .toBlocking()
                 .single();
     }
 
+    /**
+     * Delete an application from the handler service
+     *
+     * @param _application The application
+     * @return The deleted HandlerApplication
+     */
     public HandlerApplication deleteApplication(HandlerApplication _application) {
         return wrapped.deleteApplication(_application)
                 .toBlocking()
                 .single();
     }
 
+    /**
+     * Get all devices from the handler service
+     *
+     * @param _application The application to list devices of
+     * @return The List of HandlerDevice objects
+     */
     public List<HandlerDevice> getDevices(HandlerApplication _application) {
         return wrapped.getDevices(_application)
                 .toList()
@@ -81,12 +121,25 @@ public class Handler {
                 .single();
     }
 
+    /**
+     * Get a device from the handler service
+     *
+     * @param _application The application containing the device
+     * @param _deviceId The device id
+     * @return The HandlerDevice object
+     */
     public HandlerDevice getDevice(HandlerApplication _application, String _deviceId) {
         return wrapped.getDevice(_application, _deviceId)
                 .toBlocking()
                 .single();
     }
 
+    /**
+     * Update (or create) a device on the handler service
+     *
+     * @param _device The device
+     * @return The updated HandlerDevice
+     */
     public HandlerDevice setDevice(HandlerDevice _device) {
         return wrapped.setDevice(_device)
                 .toBlocking()
@@ -94,6 +147,12 @@ public class Handler {
 
     }
 
+    /**
+     * Delete a device on the handler service
+     *
+     * @param _device The device
+     * @return The deleted HandlerDevice
+     */
     public HandlerDevice deleteDevice(HandlerDevice _device) {
         return wrapped.deleteDevice(_device)
                 .toBlocking()
