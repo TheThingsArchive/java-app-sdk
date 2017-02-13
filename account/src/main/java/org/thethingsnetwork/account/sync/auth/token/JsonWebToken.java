@@ -27,7 +27,7 @@ import java.net.URI;
 import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
 
 /**
- *
+ * Json Web Token wrapper
  * @author Romain Cambier
  */
 public class JsonWebToken implements OAuth2Token {
@@ -41,6 +41,15 @@ public class JsonWebToken implements OAuth2Token {
     @Override
     public boolean hasRefresh() {
         return wrapped.hasRefresh();
+    }
+    
+    /**
+     * Get the expiration
+     *
+     * @return The expiration
+     */
+    protected long getExpiration() {
+        return wrapped.getExpiration();
     }
 
     @Override

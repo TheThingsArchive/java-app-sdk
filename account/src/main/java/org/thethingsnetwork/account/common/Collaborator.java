@@ -38,24 +38,48 @@ public class Collaborator {
     private String email;
     private List<String> rights;
 
+    /**
+     * Create an empty Collaborator. Used only by jackson
+     */
     public Collaborator() {
 
     }
 
+    /**
+     * Create a new Collaborator
+     *
+     * @param _username The username of the Collaborator
+     * @param _rights The rights of the Collaborator
+     */
     public Collaborator(String _username, List<String> _rights) {
         username = _username;
         email = null;
         rights = _rights;
     }
 
+    /**
+     * Get the username
+     *
+     * @return The username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Get the email address
+     *
+     * @return The email address
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Get the rights
+     *
+     * @return The rights
+     */
     public List<String> getRights() {
         return Collections.unmodifiableList(rights);
     }

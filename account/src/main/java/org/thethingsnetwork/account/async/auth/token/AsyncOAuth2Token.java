@@ -27,21 +27,45 @@ import java.net.URI;
 import rx.Observable;
 
 /**
- *
+ * Base interface of any async Oauth2 token
  * @author Romain Cambier
  */
 public interface AsyncOAuth2Token {
 
+    /**
+     * Wether or not this token has a refresh method
+     * @return True if it has
+     */
     public boolean hasRefresh();
 
+    /**
+     * Refresh this token
+     * @return The refreshed token as an Observable stream
+     */
     public Observable<? extends AsyncOAuth2Token> refresh();
     
+    /**
+     * Whether this token has expired
+     * @return True if this token has expired
+     */
     public boolean isExpired();
 
+    /**
+     * Get the http token
+     * @return The http token
+     */
     public String getToken();
     
+    /**
+     * Get the raw token
+     * @return The raw token
+     */
     public String getRawToken();
     
+    /**
+     * Get the account server URI
+     * @return The account server URI
+     */
     public URI getAccountServer();
 
 }

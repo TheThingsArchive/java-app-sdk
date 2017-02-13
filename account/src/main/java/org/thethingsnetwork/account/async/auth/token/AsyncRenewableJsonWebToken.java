@@ -33,7 +33,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
- *
+ * Async Renewable Json Web Token wrapper
  * @author Romain Cambier
  */
 public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
@@ -41,6 +41,13 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
     private String refreshToken;
     private final AsyncAuthorizationCode provider;
 
+    /**
+     * Create an instance
+     * @param _token The raw token
+     * @param _expiration The token expiration
+     * @param _refreshToken The refresh token
+     * @param _provider  The token provider
+     */
     public AsyncRenewableJsonWebToken(String _token, long _expiration, String _refreshToken, AsyncAuthorizationCode _provider) {
         super(_token, _expiration, _provider.getAccountServer());
         if (_refreshToken == null) {
@@ -58,10 +65,18 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
         return true;
     }
 
+    /**
+     * Set the refresh token
+     * @param _refreshToken The refresh token
+     */
     protected void setRefreshToken(String _refreshToken) {
         refreshToken = _refreshToken;
     }
 
+    /**
+     * Get the refresh token
+     * @return The refresh token
+     */
     public String getRefreshToken() {
         return refreshToken;
     }
@@ -71,6 +86,11 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
         return provider.refreshToken(this);
     }
 
+    /**
+     * Restrict this token to a finer claims list
+     * @param _claims The claims to restrict this token to
+     * @return A new AsyncRenewableJsonWebToken as an Observable stream
+     */
     public Observable<AsyncRenewableJsonWebToken> restrict(List<String> _claims) {
         AsyncRenewableJsonWebToken that = this;
         return Observable
@@ -115,10 +135,22 @@ public class AsyncRenewableJsonWebToken extends AsyncJsonWebToken {
                 });
     }
 
+    /**
+     * Restrict this token to a finer claims list
+     * @param _claims The claims to restrict this token to
+     * @return A new AsyncRenewableJsonWebToken as an Observable stream
+     */
     public Observable<AsyncRenewableJsonWebToken> restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
 
+    /**
+     * Refresh this token
+     * @param _refreshToken New refresh token
+     * @param _accessToken New access token
+     * @param _expiration New expiration
+     * @return The updated AsyncRenewableJsonWebToken
+     */
     public AsyncRenewableJsonWebToken refresh(String _refreshToken, String _accessToken, long _expiration) {
         setRefreshToken(_refreshToken);
         setToken(_accessToken);

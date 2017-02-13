@@ -30,6 +30,7 @@ import org.thethingsnetwork.account.common.GrantType;
 import org.thethingsnetwork.account.sync.auth.token.JsonWebToken;
 
 /**
+ * This token provider uses application credentials (id + access-key) to generate a token only usable for the owning application
  *
  * @author Romain Cambier
  */
@@ -37,14 +38,27 @@ public class ApplicationPassword extends GrantType {
 
     private final AsyncApplicationPassword wrapped;
 
-    public ApplicationPassword(AsyncApplicationPassword _wrapped) {
-        wrapped = _wrapped;
-    }
-
+    /**
+     * Create an instance of this token provider using fully-customized settings
+     *
+     * @param _appId The application id
+     * @param _key The application access-key
+     * @param _clientId The client id you received from the account server
+     * @param _clientSecret The client secret you received from the account server
+     * @param _accountServer The account server to be used
+     */
     public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret, URI _accountServer) {
         wrapped = new AsyncApplicationPassword(_appId, _key, _clientId, _clientSecret, _accountServer);
     }
 
+    /**
+     * Create an instance of this token provider using default account server
+     *
+     * @param _appId The application id
+     * @param _key The application access-key
+     * @param _clientId The client id you received from the account server
+     * @param _clientSecret The client secret you received from the account server
+     */
     public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret) {
         wrapped = new AsyncApplicationPassword(_appId, _key, _clientId, _clientSecret);
     }
@@ -54,6 +68,11 @@ public class ApplicationPassword extends GrantType {
         return wrapped.getAccountServer();
     }
 
+    /**
+     * Create a token using the settings provided in the constructor
+     *
+     * @return the JsonWebToken as an Observable stream
+     */
     public JsonWebToken getToken() {
         return wrapped.getToken()
                 .map((AsyncJsonWebToken t) -> new JsonWebToken(t))

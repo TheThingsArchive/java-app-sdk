@@ -32,18 +32,46 @@ import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
  */
 public interface OAuth2Token {
     
+    /**
+     * Wether or not this token has a refresh method
+     * @return True if it has
+     */
     public boolean hasRefresh();
 
-    public <T extends OAuth2Token> T refresh();
+    /**
+     * Refresh this token
+     * @return The refreshed token
+     */
+    public OAuth2Token refresh();
     
+    /**
+     * Whether this token has expired
+     * @return True if this token has expired
+     */
     public boolean isExpired();
 
+    /**
+     * Get the http token
+     * @return The http token
+     */
     public String getToken();
     
+    /**
+     * Get the raw token
+     * @return The raw token
+     */
     public String getRawToken();
     
+    /**
+     * Get the account server URI
+     * @return The account server URI
+     */
     public URI getAccountServer();
     
-    public <T extends AsyncOAuth2Token> T async();
+    /**
+     * Get the wrapped async token
+     * @return The wrapped async token
+     */
+    public AsyncOAuth2Token async();
     
 }

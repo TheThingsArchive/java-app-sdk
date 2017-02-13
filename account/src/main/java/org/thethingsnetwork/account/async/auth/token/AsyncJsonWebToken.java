@@ -27,6 +27,7 @@ import java.net.URI;
 import rx.Observable;
 
 /**
+ * Async Json Web Token wrapper
  *
  * @author Romain Cambier
  */
@@ -36,6 +37,13 @@ public class AsyncJsonWebToken implements AsyncOAuth2Token {
     private long expiration;
     private final URI accountServer;
 
+    /**
+     * Build an instance
+     *
+     * @param _token The raw token
+     * @param _expiration The token expiration (millis)
+     * @param _accountServer The account server
+     */
     public AsyncJsonWebToken(String _token, long _expiration, URI _accountServer) {
         if (_token == null) {
             throw new IllegalArgumentException("token can not be null");
@@ -61,7 +69,12 @@ public class AsyncJsonWebToken implements AsyncOAuth2Token {
         return Observable.error(new UnsupportedOperationException("Not supported."));
     }
 
-    protected long getExpiration() {
+    /**
+     * Get the expiration
+     *
+     * @return The expiration
+     */
+    public long getExpiration() {
         return expiration;
     }
 
@@ -75,10 +88,20 @@ public class AsyncJsonWebToken implements AsyncOAuth2Token {
         return "Bearer " + token;
     }
 
+    /**
+     * Set the expiration
+     *
+     * @param _expiration The expiration
+     */
     protected void setExpiration(long _expiration) {
         expiration = _expiration;
     }
 
+    /**
+     * Set the raw token
+     *
+     * @param _token The raw token
+     */
     protected void setToken(String _token) {
         token = _token;
     }

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @author Romain Cambier
  */
 public enum ApplicationRights {
-
+    
     SETTINGS("settings"),
     DELETE("delete"),
     COLLABORATORS("collaborators"),

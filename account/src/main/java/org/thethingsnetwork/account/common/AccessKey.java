@@ -38,23 +38,47 @@ public class AccessKey {
     private String key;
     private List<ApplicationRights> rights;
 
+    /**
+     * Create an empty AccessKey. Only used by jackson.
+     */
     public AccessKey() {
 
     }
 
+    /**
+     * Create a new AccessKey
+     *
+     * @param _name The key name
+     * @param _rights The key rights
+     */
     public AccessKey(String _name, List<ApplicationRights> _rights) {
         name = _name;
         rights = _rights;
     }
 
+    /**
+     * Get the key name
+     *
+     * @return The key name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the key secret
+     *
+     * @return The key secret
+     */
     public String getKey() {
         return key;
     }
 
+    /**
+     * Get the key rights
+     *
+     * @return The key rights
+     */
     public List<ApplicationRights> getRights() {
         return Collections.unmodifiableList(rights);
     }

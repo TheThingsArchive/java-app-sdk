@@ -29,6 +29,7 @@ import java.util.List;
 import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
 
 /**
+ * Renewable Json Web Token wrapper
  *
  * @author Romain Cambier
  */
@@ -74,6 +75,12 @@ public class RenewableJsonWebToken implements OAuth2Token {
         return wrapped.getAccountServer();
     }
 
+    /**
+     * Restrict this token to a finer claims list
+     *
+     * @param _claims The claims to restrict this token to
+     * @return A new RenewableJsonWebToken
+     */
     public RenewableJsonWebToken restrict(List<String> _claims) {
         return wrapped.restrict(_claims)
                 .map((AsyncRenewableJsonWebToken t) -> new RenewableJsonWebToken(t))
@@ -81,6 +88,12 @@ public class RenewableJsonWebToken implements OAuth2Token {
                 .single();
     }
 
+    /**
+     * Restrict this token to a finer claims list
+     *
+     * @param _claims The claims to restrict this token to
+     * @return A new RenewableJsonWebToken
+     */
     public RenewableJsonWebToken restrict(String... _claims) {
         return restrict(Arrays.asList(_claims));
     }
