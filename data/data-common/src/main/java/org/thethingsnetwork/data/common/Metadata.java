@@ -54,7 +54,7 @@ public class Metadata {
     }
 
     /**
-     * Get the  frequency of this packet
+     * Get the frequency of this packet
      *
      * @return the frequency, in MHz
      */
@@ -100,6 +100,7 @@ public class Metadata {
 
     /**
      * Get the list of gateways that received this packet
+     *
      * @return a List of Gateway
      */
     public List<Gateway> getGateways() {
@@ -109,16 +110,18 @@ public class Metadata {
         return Collections.unmodifiableList(gateways);
     }
 
-    
     public static class Gateway {
 
-        private String id;
+        private String gtwId;
         private long timestamp;
         private String time;
         private int channel;
         private double rssi;
         private double snr;
         private int rfChain;
+        private double latitude;
+        private double longitude;
+        private double altitude;
 
         private Gateway() {
 
@@ -126,14 +129,16 @@ public class Metadata {
 
         /**
          * Get the Gateway ID as registered in TheThingsNetwork
+         *
          * @return the gateway id
          */
         public String getId() {
-            return id;
+            return gtwId;
         }
 
         /**
          * Get the Gateway internal reception time
+         *
          * @return the gateway internal reception time
          */
         public long getTimestamp() {
@@ -142,6 +147,7 @@ public class Metadata {
 
         /**
          * Get the Gateway absolute reception time
+         *
          * @return the gateway absolute reception time
          */
         public String getTime() {
@@ -150,6 +156,7 @@ public class Metadata {
 
         /**
          * Get the channel this packet was sent on
+         *
          * @return the channel this packet was sent on
          */
         public int getChannel() {
@@ -158,6 +165,7 @@ public class Metadata {
 
         /**
          * Get the RX rssi of this packet
+         *
          * @return the RX rssi of this packet
          */
         public double getRssi() {
@@ -166,6 +174,7 @@ public class Metadata {
 
         /**
          * Get the RX snr of this packet
+         *
          * @return the RX snr of this packet
          */
         public double getSnr() {
@@ -174,10 +183,38 @@ public class Metadata {
 
         /**
          * Get the RF chain of this packet
+         *
          * @return the RF chain of this packet
          */
         public int getRfChain() {
             return rfChain;
+        }
+
+        /**
+         * Get the gateway latitude
+         *
+         * @return the gateway latitude
+         */
+        public double getLatitude() {
+            return latitude;
+        }
+
+        /**
+         * Get the gateway longitude
+         *
+         * @return the gateway longitude
+         */
+        public double getLongitude() {
+            return longitude;
+        }
+
+        /**
+         * Get the gateway altitude
+         *
+         * @return the gateway altitude
+         */
+        public double getAltitude() {
+            return altitude;
         }
     }
 }

@@ -27,3 +27,4 @@
 /data/data-common/target/
 /samples/ttnmgmt/target/
 /samples/samples-management/target/
+/samples/samples-amqp/target/

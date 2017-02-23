@@ -25,6 +25,7 @@ package org.thethingsnetwork.data.common;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import java.util.function.BiConsumer;
@@ -47,7 +48,8 @@ public abstract class AbstractClient {
         MAPPER
                 .setVisibility(PropertyAccessor.ALL, Visibility.NONE)
                 .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     /**

@@ -35,6 +35,10 @@ import org.thethingsnetwork.data.common.Metadata;
  */
 public class UplinkMessage implements DataMessage {
 
+    private String appId;
+    private String devId;
+    private String hardwareSerial;
+    private boolean isRetry;
     private int port;
     private int counter;
     private String payloadRaw;
@@ -74,6 +78,7 @@ public class UplinkMessage implements DataMessage {
 
     /**
      * Get the payload fields. Only if you have a decoder function
+     *
      * @return the payload fields as a Map where keys are strings, and values are any json-valid entity
      */
     public Map<String, Object> getPayloadFields() {
@@ -82,10 +87,47 @@ public class UplinkMessage implements DataMessage {
 
     /**
      * Get the metadata of this uplink packet
+     *
      * @return the metadata
      */
     public Metadata getMetadata() {
         return metadata;
+    }
+
+    /**
+     * Get the application id
+     *
+     * @return the application id
+     */
+    public String getAppId() {
+        return appId;
+    }
+
+    /**
+     * Get the device id
+     *
+     * @return the device id
+     */
+    public String getDevId() {
+        return devId;
+    }
+
+    /**
+     * Get the hardware serial
+     *
+     * @return the hardware serial
+     */
+    public String getHardwareSerial() {
+        return hardwareSerial;
+    }
+
+    /**
+     * Check if this message is a retry
+     *
+     * @return true if the message is a retry
+     */
+    public boolean isRetry() {
+        return isRetry;
     }
 
 }
