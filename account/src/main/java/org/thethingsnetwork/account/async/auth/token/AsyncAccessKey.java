@@ -6,21 +6,17 @@
 package org.thethingsnetwork.account.async.auth.token;
 
 import java.net.URI;
-import org.thethingsnetwork.account.common.GrantType;
 import rx.Observable;
 
 /**
- *
+ * Async Access Key wrapper
+ * 
  * @author Romain Cambier
  */
 public class AsyncAccessKey implements AsyncOAuth2Token {
 
     private final String accessKey;
     private final URI accountServer;
-
-    public AsyncAccessKey(String _accessKey) {
-        this(_accessKey, GrantType.DEFAULT_ACCOUNT_SERVER);
-    }
 
     public AsyncAccessKey(String _accessKey, URI _accountServer) {
         accessKey = _accessKey;
