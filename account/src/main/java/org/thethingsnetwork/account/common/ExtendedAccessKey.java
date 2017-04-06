@@ -32,7 +32,7 @@ import java.util.List;
  * @author Romain Cambier
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessKey {
+public class ExtendedAccessKey {
 
     private String name;
     private String key;
@@ -41,7 +41,7 @@ public class AccessKey {
     /**
      * Create an empty AccessKey. Only used by jackson.
      */
-    public AccessKey() {
+    public ExtendedAccessKey() {
 
     }
 
@@ -51,7 +51,7 @@ public class AccessKey {
      * @param _name The key name
      * @param _rights The key rights
      */
-    public AccessKey(String _name, List<ApplicationRights> _rights) {
+    public ExtendedAccessKey(String _name, List<ApplicationRights> _rights) {
         name = _name;
         rights = _rights;
     }

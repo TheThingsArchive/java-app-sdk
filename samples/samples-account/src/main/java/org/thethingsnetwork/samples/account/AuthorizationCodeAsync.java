@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import org.thethingsnetwork.account.async.AsyncApplication;
 import org.thethingsnetwork.account.async.auth.grant.AsyncAuthorizationCode;
 import org.thethingsnetwork.account.async.auth.token.AsyncRenewableJsonWebToken;
-import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ExtendedAccessKey;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -90,9 +90,9 @@ public class AuthorizationCodeAsync {
                                                         application.updateCredentials(restrictedToken);
                                                     }
                                                 })
-                                                .flatMap(new Func1<AsyncRenewableJsonWebToken, Observable<AccessKey>>() {
+                                                .flatMap(new Func1<AsyncRenewableJsonWebToken, Observable<ExtendedAccessKey>>() {
                                                     @Override
-                                                    public Observable<AccessKey> call(AsyncRenewableJsonWebToken restrictedToken) {
+                                                    public Observable<ExtendedAccessKey> call(AsyncRenewableJsonWebToken restrictedToken) {
                                                         return application.getAccessKeys();
                                                     }
                                                 })

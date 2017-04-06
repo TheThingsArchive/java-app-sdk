@@ -26,35 +26,23 @@ package org.thethingsnetwork.samples.account;
 import java.util.List;
 import org.thethingsnetwork.account.common.ExtendedAccessKey;
 import org.thethingsnetwork.account.sync.Application;
-import org.thethingsnetwork.account.sync.auth.grant.ApplicationPassword;
-import org.thethingsnetwork.account.sync.auth.token.JsonWebToken;
+import org.thethingsnetwork.account.sync.auth.grant.ApplicationAccessKey;
+import org.thethingsnetwork.account.sync.auth.token.AccessKey;
 
 /**
  *
  * @author Romain Cambier
  */
-public class ApplicationPasswordSync {
-
+public class ApplicationAccessKeySync {
+    
     public static void run(App.Config _conf) {
-        if (_conf.cliendId == null) {
-            throw new NullPointerException("missing cliendId");
-        }
-
-        if (_conf.clientSecret == null) {
-            throw new NullPointerException("missing clientSecret");
-        }
-
-        if (_conf.applicationId == null) {
-            throw new NullPointerException("missing applicationId");
-        }
-
         if (_conf.applicationKey == null) {
             throw new NullPointerException("missing applicationKey");
         }
 
-        ApplicationPassword tokenProvider = new ApplicationPassword(_conf.applicationId, _conf.applicationKey, _conf.cliendId, _conf.clientSecret);
+        ApplicationAccessKey tokenProvider = new ApplicationAccessKey(_conf.applicationKey);
 
-        JsonWebToken token = tokenProvider.getToken();
+        AccessKey token = tokenProvider.getToken();
 
         Application app = Application.findOne(token, _conf.applicationId);
 
@@ -62,5 +50,5 @@ public class ApplicationPasswordSync {
 
         System.out.println("\tapplication " + app.getName() + " has " + accessKeys.size() + " keys");
     }
-
+    
 }
