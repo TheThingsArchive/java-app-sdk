@@ -36,7 +36,7 @@ public abstract class GrantType {
 
     static {
         try {
-            DEFAULT_ACCOUNT_SERVER = new URI("https://account.thethingsnetwork.org");
+            DEFAULT_ACCOUNT_SERVER = new URI("https://account.thethingsnetwork.org/api/v2");
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
