@@ -48,6 +48,10 @@ public class App {
         ApplicationPasswordAsync.run(cfg);
         System.out.println("Starting ApplicationPasswordSync");
         ApplicationPasswordSync.run(cfg);
+        System.out.println("Starting ApplicationAccessKeyAsync");
+        ApplicationAccessKeyAsync.run(cfg);
+        System.out.println("Starting ApplicationAccessKeySync");
+        ApplicationAccessKeySync.run(cfg);
         
         HttpRequest.shutdown();
 
