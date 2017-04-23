@@ -21,31 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.common;
+package org.thethingsnetwork.account.sync.auth.token;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import org.thethingsnetwork.account.async.auth.token.AsyncAccessKey;
 
 /**
- *
+ * Access Key wrapper
  * @author Romain Cambier
  */
-public abstract class GrantType {
+public class AccessKey implements OAuth2Token {
 
-    public static final URI DEFAULT_ACCOUNT_SERVER;
+    private final AsyncAccessKey wrapped;
 
-    static {
-        try {
-            DEFAULT_ACCOUNT_SERVER = new URI("https://account.thethingsnetwork.org/api/v2");
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
+    public AccessKey(AsyncAccessKey _wrap) {
+        wrapped = _wrap;
+    }
+
+    @Override
+    public boolean hasRefresh() {
+        return wrapped.hasRefresh();
+    }
+
+    @Override
+    public JsonWebToken refresh() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public boolean isExpired() {
+        return wrapped.isExpired();
+    }
+
+    @Override
+    public String getToken() {
+        return wrapped.getToken();
+    }
+
+    @Override
+    public String getRawToken() {
+        return wrapped.getRawToken();
+    }
+
+    @Override
+    public URI getAccountServer() {
+        return wrapped.getAccountServer();
+    }
+
+    @Override
+    public AsyncAccessKey async() {
+        return wrapped;
     }
     
-    /**
-     * Get the account server used by this token provider
-     * @return The account server URI
-     */
-    public abstract URI getAccountServer();
-
 }

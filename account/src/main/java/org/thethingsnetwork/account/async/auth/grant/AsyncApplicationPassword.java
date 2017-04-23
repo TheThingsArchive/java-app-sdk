@@ -35,6 +35,7 @@ import rx.Subscriber;
 
 /**
  * This token provider uses application credentials (id + access-key) to generate a token only usable for the owning application
+ * It will exchange the access key for an access token using client credentials.
  *
  * @author Romain Cambier
  */

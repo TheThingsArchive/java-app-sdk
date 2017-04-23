@@ -28,7 +28,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.thethingsnetwork.account.async.auth.token.AsyncOAuth2Token;
 import org.thethingsnetwork.account.common.AbstractApplication;
-import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ExtendedAccessKey;
 import org.thethingsnetwork.account.common.ApplicationRights;
 import org.thethingsnetwork.account.common.Collaborator;
 import org.thethingsnetwork.account.sync.Application;
@@ -349,7 +349,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
      *
      * @return the list of AccessKey of this AsyncApplication as an Observable stream.
      */
-    public Observable<AccessKey> getAccessKeys() {
+    public Observable<ExtendedAccessKey> getAccessKeys() {
         /**
          * GET /applications/{app_id}/access-keys
          */
@@ -357,8 +357,8 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
                 .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys")
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().get())
-                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey[].class))
-                .flatMap((AccessKey[] cs) -> Observable.from(cs));
+                .flatMap((HttpRequest t) -> t.doExecuteForType(ExtendedAccessKey[].class))
+                .flatMap((ExtendedAccessKey[] cs) -> Observable.from(cs));
     }
 
     /**
@@ -367,7 +367,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
      * @param _keyname the name of the AccessKey
      * @return the AccessKey as an Observable stream.
      */
-    public Observable<AccessKey> findOneAccessKey(String _keyname) {
+    public Observable<ExtendedAccessKey> findOneAccessKey(String _keyname) {
         /**
          * GET /applications/{app_id}/access-keys/{keyname}
          */
@@ -375,7 +375,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
                 .from(creds.getAccountServer() + "/applications/" + getId() + "/access-keys/" + _keyname)
                 .flatMap((HttpRequest t) -> t.inject(creds))
                 .doOnNext((HttpRequest t) -> t.getBuilder().get())
-                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey.class));
+                .flatMap((HttpRequest t) -> t.doExecuteForType(ExtendedAccessKey.class));
     }
 
     /**
@@ -384,7 +384,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
      * @param _key the AccessKey template
      * @return the new AccessKey as an Observable stream.
      */
-    public Observable<AccessKey> addAccessKey(AccessKey _key) {
+    public Observable<ExtendedAccessKey> addAccessKey(ExtendedAccessKey _key) {
         /**
          * POST /applications/{app_id}/access-keys
          */
@@ -398,8 +398,8 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
                             return t;
                         })
                 )
-                .flatMap((HttpRequest t) -> t.doExecuteForType(AccessKey.class))
-                .map((AccessKey c) -> c);
+                .flatMap((HttpRequest t) -> t.doExecuteForType(ExtendedAccessKey.class))
+                .map((ExtendedAccessKey c) -> c);
     }
 
     /**
@@ -408,7 +408,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
      * @param _key the AccessKey
      * @return the updated AsyncApplication as an Observable stream.
      */
-    public Observable<AsyncApplication> removeAccessKey(AccessKey _key) {
+    public Observable<AsyncApplication> removeAccessKey(ExtendedAccessKey _key) {
         /**
          * DELETE /applications/{app_id}/access-keys/{keyname}
          */

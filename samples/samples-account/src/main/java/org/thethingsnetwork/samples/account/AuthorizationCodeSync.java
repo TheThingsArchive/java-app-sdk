@@ -26,7 +26,7 @@ package org.thethingsnetwork.samples.account;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
-import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ExtendedAccessKey;
 import org.thethingsnetwork.account.sync.Application;
 import org.thethingsnetwork.account.sync.auth.grant.AuthorizationCode;
 import org.thethingsnetwork.account.sync.auth.token.RenewableJsonWebToken;
@@ -73,7 +73,7 @@ public class AuthorizationCodeSync {
 
             app.updateCredentials(restrictedToken);
 
-            List<AccessKey> accessKeys = app.getAccessKeys();
+            List<ExtendedAccessKey> accessKeys = app.getAccessKeys();
 
             System.out.println("\tapplication " + app.getName() + " has " + accessKeys.size() + " keys");
 

@@ -21,63 +21,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.account.sync.auth.grant;
+package org.thethingsnetwork.account.async.auth.grant;
 
 import java.net.URI;
-import org.thethingsnetwork.account.async.auth.grant.AsyncApplicationPassword;
-import org.thethingsnetwork.account.async.auth.token.AsyncJsonWebToken;
+import org.thethingsnetwork.account.async.auth.token.AsyncAccessKey;
 import org.thethingsnetwork.account.common.GrantType;
-import org.thethingsnetwork.account.sync.auth.token.JsonWebToken;
+import rx.Observable;
 
 /**
- * This token provider uses application credentials (id + access-key) to generate a token only usable for the owning application
+ * This token provider uses application credentials (access-key) to generate a token only usable for the owning application.
+ * It will always use access keys for authentication.
  *
  * @author Romain Cambier
  */
-public class ApplicationPassword extends GrantType {
+public class AsyncApplicationAccessKey extends GrantType {
 
-    private final AsyncApplicationPassword wrapped;
+    private final String key;
+    private final URI accountServer;
 
     /**
      * Create an instance of this token provider using fully-customized settings
      *
-     * @param _appId The application id
      * @param _key The application access-key
-     * @param _clientId The client id you received from the account server
-     * @param _clientSecret The client secret you received from the account server
      * @param _accountServer The account server to be used
      */
-    public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret, URI _accountServer) {
-        wrapped = new AsyncApplicationPassword(_appId, _key, _clientId, _clientSecret, _accountServer);
+    public AsyncApplicationAccessKey(String _key, URI _accountServer) {
+        if (_key == null) {
+            throw new IllegalArgumentException("key can not be null");
+        }
+        if (_accountServer == null) {
+            throw new IllegalArgumentException("accountServer can not be null");
+        }
+        key = _key;
+        accountServer = _accountServer;
     }
 
     /**
      * Create an instance of this token provider using default account server
      *
-     * @param _appId The application id
      * @param _key The application access-key
-     * @param _clientId The client id you received from the account server
-     * @param _clientSecret The client secret you received from the account server
      */
-    public ApplicationPassword(String _appId, String _key, String _clientId, String _clientSecret) {
-        wrapped = new AsyncApplicationPassword(_appId, _key, _clientId, _clientSecret);
+    public AsyncApplicationAccessKey(String _key) {
+        this(_key, GrantType.DEFAULT_ACCOUNT_SERVER);
     }
 
     @Override
     public URI getAccountServer() {
-        return wrapped.getAccountServer();
+        return accountServer;
     }
 
     /**
      * Create a token using the settings provided in the constructor
      *
-     * @return the JsonWebToken
+     * @return the AsyncAccessKey as an Observable stream
      */
-    public JsonWebToken getToken() {
-        return wrapped.getToken()
-                .map((AsyncJsonWebToken t) -> new JsonWebToken(t))
-                .toBlocking()
-                .single();
+    public Observable<AsyncAccessKey> getToken() {
+        return Observable.just(new AsyncAccessKey(key, accountServer));
     }
 
 }

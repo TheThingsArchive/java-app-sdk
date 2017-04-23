@@ -26,7 +26,7 @@ package org.thethingsnetwork.account.sync;
 import java.util.List;
 import org.thethingsnetwork.account.async.AsyncApplication;
 import org.thethingsnetwork.account.common.AbstractApplication;
-import org.thethingsnetwork.account.common.AccessKey;
+import org.thethingsnetwork.account.common.ExtendedAccessKey;
 import org.thethingsnetwork.account.common.ApplicationRights;
 import org.thethingsnetwork.account.common.Collaborator;
 import org.thethingsnetwork.account.sync.auth.token.OAuth2Token;
@@ -224,7 +224,7 @@ public class Application implements AbstractApplication<OAuth2Token> {
      *
      * @return the list of AccessKey of this Application
      */
-    public List<AccessKey> getAccessKeys() {
+    public List<ExtendedAccessKey> getAccessKeys() {
         return wrapped.getAccessKeys()
                 .toList()
                 .toBlocking()
@@ -237,7 +237,7 @@ public class Application implements AbstractApplication<OAuth2Token> {
      * @param _keyname the name of the AccessKey
      * @return the AccessKey
      */
-    public AccessKey findOneAccessKey(String _keyname) {
+    public ExtendedAccessKey findOneAccessKey(String _keyname) {
         return wrapped.findOneAccessKey(_keyname)
                 .toBlocking()
                 .singleOrDefault(null);
@@ -249,7 +249,7 @@ public class Application implements AbstractApplication<OAuth2Token> {
      * @param _key the AccessKey template
      * @return the new AccessKey
      */
-    public AccessKey addAccessKey(AccessKey _key) {
+    public ExtendedAccessKey addAccessKey(ExtendedAccessKey _key) {
         return wrapped.addAccessKey(_key)
                 .toBlocking()
                 .single();
@@ -261,7 +261,7 @@ public class Application implements AbstractApplication<OAuth2Token> {
      * @param _key the AccessKey
      * @return the updated Application
      */
-    public Application removeAccessKey(AccessKey _key) {
+    public Application removeAccessKey(ExtendedAccessKey _key) {
         return wrapped.removeAccessKey(_key)
                 .map((i) -> this)
                 .toBlocking()
