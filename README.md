@@ -21,8 +21,10 @@ This is the Java SDK for [The Things Network](https://www.thethingsnetwork.org) 
 
 To build the Things Network Java SDK from the sources Docker can be used as follows
 
-  docker build -t java_builder .
-  docker run -it -v ///c/<your windows directory to the TTN java sdk>:/java-app-sdk java_builder
-  <docker-container-prompt>:/# cd java-app-sdk/
-  <docker-container-prompt>:/java-app-sdk# ./run.sh
+```
+docker build -t java_builder .
+docker run -it -v ///c/<your windows directory to the TTN java sdk>:/java-app-sdk java_builder
+<docker-container-prompt>:/# cd java-app-sdk/
+<docker-container-prompt>:/java-app-sdk# ./run.sh
+```
   
