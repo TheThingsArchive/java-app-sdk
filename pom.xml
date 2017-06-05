@@ -10,6 +10,7 @@
         <module>data</module>
         <module>management</module>
         <module>account</module>
+        <module>samples</module>
     </modules>
     
     <name>The Things Network Java SDK</name>

@@ -21,6 +21,6 @@ if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH = "master" ]]; the
 else
     mvn clean package javadoc:aggregate javadoc:jar source:jar-no-fork \
     && cd samples \
-    && mvn clean package
+    && mvn package
     exit $?
 fi

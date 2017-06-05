@@ -1,30 +1,31 @@
+# Java-app-sdk specific
+management/src/main/proto/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Maven
+dependency-reduced-pom.xml
+log/
+target/
+
+# Compiled/packaged Files
+*.class
+*.jar
+*.war
+*.ear
+
+# Mac
+.DS_Store
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 /target/
-/sample/target/
-/.classpath
-/.project
-/.settings
-/handler-message-mqtt/target/
-/handler-message-amqp/target/
-/samples/sample/target/
-/samples/remove_me_mqtt/target/
-/samples/target/
-/account/target/
-/handler-manage/target/
-/data-mqtt/target/
-/data-amqp/target/
-/data/data-amqp/target/
-/data/data-mqtt/target/
-/management/target/
-/data/common/target/
-/data/amqp/target/
-/data/mqtt/target/
-/data/target/
-/samples/mqtt/target/
-/.license
-/management/src/main/proto/
-/samples/account/target/
-/samples/samples-account/target/
-/data/data-common/target/
-/samples/ttnmgmt/target/
-/samples/samples-management/target/
-/samples/samples-amqp/target/

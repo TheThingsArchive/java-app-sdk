@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.thethingsnetwork.samples.mqtt;
+package org.thethingsnetwork.samples.amqp;
 
 import org.thethingsnetwork.data.amqp.Client;
 import org.thethingsnetwork.data.common.Connection;
