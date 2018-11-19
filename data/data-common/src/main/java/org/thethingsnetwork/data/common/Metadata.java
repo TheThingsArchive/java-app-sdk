@@ -38,6 +38,11 @@ public class Metadata {
     private String dataRate;
     private String bitRate;
     private String codingRate;
+    private double airtime;
+    private double latitude;
+    private double longitude;
+    private double altitude;
+    private String location_source;
     private List<Gateway> gateways;
 
     private Metadata() {
@@ -96,6 +101,52 @@ public class Metadata {
      */
     public String getCodingRate() {
         return codingRate;
+    }
+
+    /**
+     * Gets the estimated airtime of the message in nanoseconds
+     *
+     * @return airtime in nanoseconds
+     */
+    public double getAirtime() {
+        return airtime;
+    }
+
+    /**
+     * The latitude of the device
+     *
+     * @return the device latitude
+     */
+    public double getLatitude() {
+        return latitude;
+    }
+
+    /**
+     * The longitude of the device
+     *
+     * @return the device longitude
+     */
+    public double getLongitude() {
+        return longitude;
+    }
+
+    /**
+     * The altitude of the device
+     *
+     * @return the device altitude
+     */
+    public double getAltitude() {
+        return altitude;
+    }
+
+    /**
+     * A text keyword indicating the origin of the location values, such as
+	 * registry (manually set), by gps, triangulation, etc.
+     *
+     * @return the soruce of the location values
+     */
+    public String getLocationSource() {
+        return location_source;
     }
 
     /**
