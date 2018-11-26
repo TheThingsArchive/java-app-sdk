@@ -38,6 +38,12 @@ public class Metadata {
     private String dataRate;
     private String bitRate;
     private String codingRate;
+    /* extra fields we need */
+    private double airtime;
+    private double latitude;
+    private double longitude;
+    private double altitude;
+    private String location_source;
     private List<Gateway> gateways;
 
     private Metadata() {
@@ -108,6 +114,26 @@ public class Metadata {
             return null;
         }
         return Collections.unmodifiableList(gateways);
+    }
+
+    public double getAirtime() {
+        return airtime;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public String getLocation_source() {
+        return location_source;
     }
 
     public static class Gateway {
