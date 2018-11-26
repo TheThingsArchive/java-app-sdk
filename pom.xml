@@ -8,7 +8,6 @@
     
     <modules>
         <module>data</module>
-        <module>management</module>
         <module>account</module>
     </modules>
     
