@@ -69,7 +69,6 @@ public class AsyncDiscovery {
                     try {
                         ManagedChannel ch = ManagedChannelBuilder
                                 .forAddress(_host, _port)
-                                .usePlaintext(true)
                                 .build();
                         DiscoveryGrpc.DiscoveryFutureStub stub1 = DiscoveryGrpc.newFutureStub(ch);
                         t.onNext(new AsyncDiscovery(stub1));

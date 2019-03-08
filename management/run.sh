@@ -2,7 +2,7 @@
 root=$(pwd)
 workdir="$root/src/main/proto"
 javaPackageName='org.thethingsnetwork.management.proto'
-branch='master'
+branch='feature/pprof'
 
 echo "Cleaning workspace...";
 rm -rf "$workdir/ttn"
