@@ -63,12 +63,13 @@ public class AsyncDiscovery {
      * @param _port The server port
      * @return An Observable stream containing the newly built AsyncDiscovery wrapper
      */
-    public static Observable<AsyncDiscovery> from(String _host, int _port) {
+    public static Observable<AsyncDiscovery> from(String _host, int _port, Boolean useSecureConnection) {
         return Observable
                 .create((Subscriber<? super AsyncDiscovery> t) -> {
                     try {
                         ManagedChannel ch = ManagedChannelBuilder
                                 .forAddress(_host, _port)
+                                .usePlaintext(!useSecureConnection)
                                 .build();
                         DiscoveryGrpc.DiscoveryFutureStub stub1 = DiscoveryGrpc.newFutureStub(ch);
                         t.onNext(new AsyncDiscovery(stub1));
@@ -85,7 +86,11 @@ public class AsyncDiscovery {
      * @return An Observable stream containing the newly built AsyncDiscovery wrapper
      */
     public static Observable<AsyncDiscovery> getDefault() {
-        return from(HOST, PORT);
+        return from(HOST, PORT, false);
+    }
+    
+    public static Observable<AsyncDiscovery> getDefault(Boolean useSecureConnection) {
+        return from(HOST, PORT, useSecureConnection);
     }
 
     /**
