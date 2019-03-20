@@ -47,8 +47,8 @@ public class Discovery {
      * @param _port The server port
      * @return The newly built Discovery wrapper
      */
-    public static Discovery from(String _host, int _port) {
-        return AsyncDiscovery.from(_host, _port)
+    public static Discovery from(String _host, int _port, Boolean useSecureConnection) {
+        return AsyncDiscovery.from(_host, _port, useSecureConnection)
                 .map((AsyncDiscovery t) -> new Discovery(t))
                 .toBlocking()
                 .single();
@@ -57,10 +57,19 @@ public class Discovery {
     /**
      * Build a Discovery wrapper using default servers
      *
-     * @return The newly built Discovery wrapper
+     * @return The newly built Discovery wrapper without tls
      */
     public static Discovery getDefault() {
-        return from(AsyncDiscovery.HOST, AsyncDiscovery.PORT);
+        return from(AsyncDiscovery.HOST, AsyncDiscovery.PORT, false);
+    }
+    
+    /**
+     * Build a Discovery wrapper using default servers
+     *
+     * @return The newly built Discovery wrapper with option to enable tls
+     */
+    public static Discovery getDefault(Boolean useSecureConnection) {
+        return from(AsyncDiscovery.HOST, AsyncDiscovery.PORT, useSecureConnection);
     }
 
     /**

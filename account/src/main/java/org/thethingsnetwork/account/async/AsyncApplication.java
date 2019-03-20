@@ -126,7 +126,7 @@ public class AsyncApplication implements AbstractApplication<AsyncOAuth2Token> {
          * POST /applications
          */
         return HttpRequest
-                .from(_creds.getAccountServer() + "/applications/" + _app.getId())
+                .from(_creds.getAccountServer() + "/applications")
                 .flatMap((HttpRequest t) -> t.inject(_creds))
                 .flatMap((HttpRequest t) -> HttpRequest
                         .buildRequestBody(_app)
