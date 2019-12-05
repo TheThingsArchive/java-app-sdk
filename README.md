@@ -1,6 +1,12 @@
 # The Things Network Java SDK [![Build Status](https://travis-ci.org/TheThingsNetwork/java-app-sdk.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/java-app-sdk)
 
-This is the Java SDK for [The Things Network](https://www.thethingsnetwork.org) to interact with The Things Network backend.
+**⚠️ This SDK has been discontinued and will not be further supported.**
+
+**For The Things Stack V3 based networks, use MQTT, HTTP or Pub/Sub integrations for streaming data, and gRPC and HTTP for application and device management. See [The Things Stack documentation](https://www.thethingsstack.io) for more information.**
+
+---
+
+This is the Java SDK for [The Things Network](https://www.thethingsnetwork.org) to interact with The Things Network V2 backend.
 
 ## Modules
 
